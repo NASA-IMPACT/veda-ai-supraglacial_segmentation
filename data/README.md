@@ -1,1 +1,4 @@
-## Description of dataset, how was it obtained, preprocessing steps, etc.
+# Data
+
+Obtained from Planet API.
+Contains the temporal and spatial coverage of the AOIs.
