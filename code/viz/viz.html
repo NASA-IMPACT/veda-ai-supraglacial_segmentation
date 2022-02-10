@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Planet coverage</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+    <link
+      href="https://api.tiles.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <link
+      href="styles.css"
+      rel="stylesheet"
+    />
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.js"></script>
+    <script src="config.js"></script>">
+    <script src="script.js"></script>">
+    
+  </head>
+  <body>
+    <div id="map"></div>
+    <div class="map-overlay top">
+      <div class="map-overlay-inner">
+        <h2>Time Interval</h2>
+        <label id="time"></label>
+        <input id="slider" type="range" min="0" max="17" step="1" value="0" />
+      </div>
+    </div>
+    <canvas id="myChart"></canvas>
+  </body>
+</html>
