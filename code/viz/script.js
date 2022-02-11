@@ -60,6 +60,9 @@ document.addEventListener("DOMContentLoaded", function () {
       throw err;
     }
 
+    // Set the label to the time
+    document.getElementById("location").textContent = location;
+
     map.addSource(`${dataConfig.name}-${location}`, {
       type: dataConfig.type,
       data: data,
