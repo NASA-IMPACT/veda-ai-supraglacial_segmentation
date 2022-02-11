@@ -27,4 +27,6 @@ const locations = {
   "Sverdrup Glacier": [-83.1841761, 75.6666658],
   "Giesecke Braer": [-55.2500000, 73.58333],
   "Helheim Glacier": [-38.2175095, 66.3499986],
+  "Bering glacier system": [-143.0339472, 60,3869679],
+  "Ellesmere Island": [-75.553263, 80.259482],
 }
