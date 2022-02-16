@@ -50,7 +50,7 @@ if __name__=="__main__":
     AOIs = {
         "Negribreen, Svalbard": [18.747975,78.549513,19.896046,78.677482],
         "Jakobshavns Isbrae": [-50.446716,69.070741,-49.453827,69.303492],
-        "Sverdrup Glacier": [-86.454699,74.407512,-79.313586,76.273417],
+        "Sverdrup Glacier": [-84.398284,75.380671,-81.843963,75.847390],
         "Giesecke Braer": [-55.577168,73.482949,-55.088276,73.624472],
         "Helheim Glacier": [-38.427557,66.247253,-37.615942,66.520674],
         "Bering glacier system": [-143.712158203125, 59.91097597079679, -142.2894287109375, 60.557278971727264],
@@ -79,5 +79,5 @@ if __name__=="__main__":
                 ))
         geo_obj = convert_to_geojson(data)
 
-        with open(f'../data/{loc}.geojson', 'w') as outfile:
+        with open(f'data/{loc}.geojson', 'w') as outfile:
             json.dump(geo_obj, outfile)
