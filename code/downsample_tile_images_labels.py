@@ -24,7 +24,7 @@ with open(configFilePath) as f:
 AWS_ACCESS_KEY_ID = config.get('credentials', 'AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = config.get('credentials', 'AWS_SECRET_ACCESS_KEY')
 
-downsample_factor = 5.0
+downsample_factor = 20.0
 tile_size = 224
 
 
@@ -97,7 +97,7 @@ def downsample(image, image_name, option):
         try:
 
             im = image.copy()
-            size = (np.array(im).shape[0])/5.0, (np.array(im).shape[1])/5.0
+            size = (np.array(im).shape[0])/20.0, (np.array(im).shape[1])/20.0
             im = np.array(im)
             im = skimage.transform.resize(im,(size),mode='edge',anti_aliasing=False,anti_aliasing_sigma=None,preserve_range=True,order=0) 
             im = im.astype(np.uint8)
