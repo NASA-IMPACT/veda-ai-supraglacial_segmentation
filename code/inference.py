@@ -86,7 +86,7 @@ else:
 print("!!!!! number of images: ", len(x_test_filenames))
 
 # set input image shape
-img_shape = (224, 224, 3)
+img_shape = (96, 96, 3)
 # set batch size for model
 batch_size = 2 
 
@@ -241,7 +241,7 @@ sample_image, sample_mask = batch_of_imgs[0], label[0,:,:,:]
 # Optional, you can load the model from the saved version
 load_from_checkpoint = True
 if load_from_checkpoint == True:
-  save_model_path = os.path.join(workshop_dir,'model_out_batch_{}_ep{}_nopretrain_focalloss/'.format(batch_size, EPOCHS))
+  save_model_path = os.path.join(workshop_dir,'model_out_batch_{}_ep{}_pretrain_focalloss/'.format(batch_size, EPOCHS))
   model = tf.keras.models.load_model(save_model_path, custom_objects={"loss": SparseCategoricalFocalLoss, "iou_score": iou_score})
 else:
   print("inferencing from in memory model")

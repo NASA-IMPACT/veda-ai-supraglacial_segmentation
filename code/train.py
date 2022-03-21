@@ -263,9 +263,9 @@ num_foreground_examples = len(foreground_list_y)
 r_choices = np.random.choice(num_foreground_examples, display_num)
 
 # set input image shape
-img_shape = (224, 224, 3)
+img_shape = (96, 96, 3)
 # set batch size for model
-batch_size = 2
+batch_size = 4
 
 # Function for reading the tiles into TensorFlow tensors 
 # See TensorFlow documentation for explanation of tensor: https://www.tensorflow.org/guide/tensor
@@ -493,7 +493,7 @@ sample_image, sample_mask = batch_of_imgs[0], label[0,:,:,:]
 # set number of model output channels to the number of classes (including background)
 OUTPUT_CHANNELS = 6
 
-base_model = tf.keras.applications.MobileNetV2(input_shape=[224, 224, 3], include_top=False)
+base_model = tf.keras.applications.MobileNetV2(input_shape=[96, 96, 3], include_top=False)
 
 # Use the activations of these layers
 layer_names = [
@@ -508,7 +508,7 @@ layers = [base_model.get_layer(name).output for name in layer_names]
 # Create the feature extraction model
 down_stack = tf.keras.Model(inputs=base_model.input, outputs=layers)
 
-down_stack.trainable = True # Set this to False if using pre-trained weights
+down_stack.trainable = False #True # Set this to False if using pre-trained weights
 
 up_stack = [
     pix2pix.upsample(512, 3),
@@ -518,7 +518,7 @@ up_stack = [
 ]
 
 def unet_model(output_channels):
-  inputs = tf.keras.layers.Input(shape=[224,224,3], name='first_layer')
+  inputs = tf.keras.layers.Input(shape=[96, 96, 3], name='first_layer')
   x = inputs
 
   # Downsampling through the model
@@ -570,7 +570,7 @@ epochs = range(EPOCHS)
 
 if (not os.path.isdir(workshop_dir)):
   os.mkdir(workshop_dir)
-save_model_path = os.path.join(workshop_dir,'model_out_batch_{}_ep{}_nopretrain_focalloss/'.format(batch_size, EPOCHS))
+save_model_path = os.path.join(workshop_dir,'model_out_batch_{}_ep{}_pretrain_focalloss/'.format(batch_size, EPOCHS))
 if (not os.path.isdir(save_model_path)):
   os.mkdir(save_model_path)
 model.save(save_model_path)
