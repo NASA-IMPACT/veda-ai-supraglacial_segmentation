@@ -130,12 +130,14 @@ for i_url in items_urls_s3:
         url = i_url[1]
         if option == "image":
             image_in_mem = image_from_s3("veda-ai-supraglacial-meltponds", str(i))
+            option = "image"
         else:
             image_in_mem = image_from_s3_rio(url)
-        downsample(image_in_mem, i)
+            option = "label"
+        downsample(image_in_mem, i, option)
 
 
-def tile(image, image_name):
+def tile(image, image_name, option):
     open_cv_image = np.array(image)
     image = np.array(image)
     print("downsampled image values pre tiling: ", np.unique(image))
@@ -199,13 +201,15 @@ for i in iterate_bucket_items(bucket='veda-ai-supraglacial-meltponds'):
 for i in items_s3:
     if option == "image":
         substring = "downsampled_images"
+        option = "image"
     else:
         substring = "downsampled_labels"
+        option = "label"
     substring1 = "png"
     if substring in str(i) and substring1 in str(i): 
         print(i)
         image_in_mem = image_from_s3("veda-ai-supraglacial-meltponds", str(i))
-        tile(image_in_mem, i)
+        tile(image_in_mem, i, option)
     else:
         continue
 
