@@ -80,11 +80,11 @@ train_list_fn = os.path.join(root_dir,"train_list.txt")
 x_train_filenames_fn = os.path.join(root_dir,'x_train_filenames.txt')
 y_train_filenames_fn = os.path.join(root_dir,'y_train_filenames.txt')
 
-if os.path.isfile(fn) for fn in [train_list_fn, x_train_filenames_fn, y_train_filenames_fn]:
+try:
   train_list = [line.strip() for line in open(os.path.join(root_dir,"train_list.txt"), 'r')]
   x_train_filenames = [line.strip() for line in open(os.path.join(root_dir,'x_train_filenames.txt'), 'r')]
   y_train_filenames = [line.strip() for line in open(os.path.join(root_dir,'y_train_filenames.txt'), 'r')]
-else:
+except:
   train_list, x_train_filenames, y_train_filenames = get_train_test_lists(img_dir, label_dir)
   with open(os.path.join(root_dir,'train_list.txt'), 'w') as f:
     for item in train_list:
@@ -144,14 +144,14 @@ y_val_filenames_partition_fn = os.path.join(root_dir,'y_val_filenames_partition.
 x_test_filenames_partition_fn = os.path.join(root_dir,'x_test_filenames_partition.txt')
 y_test_filenames_partition_fn = os.path.join(root_dir,'y_test_filenames_partition.txt')
 
-if os.path.isfile(fn) for fn in [x_train_filenames_partition_fn, y_train_filenames_partition, x_val_filenames_partition, y_val_filenames_partition, x_test_filenames_partition, y_test_filenames_partition]:
-  x_train_filenames_partition = [line.strip() for line in open(x_train_filenames_partition_fn, 'r')]
-  y_train_filenames_partition = [line.strip() for line in open(y_train_filenames_partition_fn, 'r')]
-  x_val_filenames_partition = [line.strip() for line in open(x_val_filenames_partition_fn, 'r')]
-  y_val_filenames_partition = [line.strip() for line in open(y_val_filenames_partition_fn, 'r')]
-  x_test_filenames_partition_fn = [line.strip() for line in open(x_test_filenames_partition_fn, 'r')]
-  y_test_filenames_partition_fn = [line.strip() for line in open(y_test_filenames_partition_fn, 'r')]
-else:
+try:
+  x_train_filenames = [line.strip() for line in open(x_train_filenames_partition_fn, 'r')]
+  y_train_filenames = [line.strip() for line in open(y_train_filenames_partition_fn, 'r')]
+  x_val_filenames = [line.strip() for line in open(x_val_filenames_partition_fn, 'r')]
+  y_val_filenames = [line.strip() for line in open(y_val_filenames_partition_fn, 'r')]
+  x_test_filenames = [line.strip() for line in open(x_test_filenames_partition_fn, 'r')]
+  y_test_filenames = [line.strip() for line in open(y_test_filenames_partition_fn, 'r')]
+except:
   x_train_filenames, x_val_filenames, y_train_filenames, y_val_filenames = train_test_split(x_train_filenames, y_train_filenames, test_size=0.3, random_state=42)
   x_val_filenames, x_test_filenames, y_val_filenames, y_test_filenames = train_test_split(x_val_filenames, y_val_filenames, test_size=0.33, random_state=42)
 

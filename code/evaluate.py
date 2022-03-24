@@ -47,9 +47,41 @@ cm = confusion_matrix(flat_truth, flat_preds, labels=list(range(OUTPUT_CHANNELS)
 
 classes = [0,1,2,3,4,5]
 
+#%matplotlib inline
+cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+fig, ax = plt.subplots(figsize=(10, 10))
+im = ax.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+ax.figure.colorbar(im, ax=ax)
+# We want to show all ticks...
+ax.set(xticks=np.arange(cm.shape[1]),
+       yticks=np.arange(cm.shape[0]),
+       # ... and label them with the respective list entries
+       xticklabels=list(range(OUTPUT_CHANNELS)), yticklabels=list(range(OUTPUT_CHANNELS)),
+       title='Normalized Confusion Matrix',
+       ylabel='True label',
+       xlabel='Predicted label')
+
+# Rotate the tick labels and set their alignment.
+plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+         rotation_mode="anchor")
+
+# Loop over data dimensions and create text annotations.
+fmt = '.2f' #'d' # if normalize else 'd'
+thresh = cm.max() / 2.
+for i in range(cm.shape[0]):
+    for j in range(cm.shape[1]):
+        ax.text(j, i, format(cm[i, j], fmt),
+                ha="center", va="center",
+                color="white" if cm[i, j] > thresh else "black")
+fig.tight_layout(pad=2.0, h_pad=2.0, w_pad=2.0)
+ax.set_ylim(len(classes)-0.5, -0.5)
+
+plt.savefig(f'{root_dir}cm.png')
+
+
 # compute f1 score
 f1 = f1_score(flat_truth, flat_preds, average='macro')
 
-print("confusion matrix: ", cm)
-print("f1 score: ", f1)
+print("cm: ", cm)
+print("f1: ", f1)
 
