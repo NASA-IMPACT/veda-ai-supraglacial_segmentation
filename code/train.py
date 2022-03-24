@@ -265,7 +265,7 @@ r_choices = np.random.choice(num_foreground_examples, display_num)
 # set input image shape
 img_shape = (96, 96, 3)
 # set batch size for model
-batch_size = 4
+batch_size = 8
 
 # Function for reading the tiles into TensorFlow tensors 
 # See TensorFlow documentation for explanation of tensor: https://www.tensorflow.org/guide/tensor
@@ -555,13 +555,51 @@ def create_mask(pred_mask):
   pred_mask = pred_mask[..., tf.newaxis]
   return pred_mask[0]
 
-EPOCHS = 5
+# Tensorboard
 
-model_history = model.fit(train_ds, 
+log_dir = os.path.join(workshop_dir,'logs/')
+log_fit_dir = os.path.join(workshop_dir,'logs', 'fit')
+log_fit_session_dir = os.path.join(workshop_dir,'logs', 'fit', datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+visualizations_dir = os.path.join(workshop_dir,'logs', 'vizualizations')
+visualizations_session_dir = os.path.join(workshop_dir,'logs', 'vizualizations', datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+
+dirs = [log_fit_dir, visualizations_dir]
+for dir in dirs:
+  if (os.path.isdir(dir)):
+    print("Making fresh log dir.")
+    shutil.rmtree(dir)
+  else:
+    print("Fresh log dir exists.")
+
+dirs = [log_dir, log_fit_dir, log_fit_session_dir, visualizations_dir, visualizations_session_dir]
+for dir in dirs:
+  if (not os.path.isdir(dir)):
+    os.mkdir(dir)
+
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_fit_session_dir, histogram_freq=1, write_graph=True)
+
+# get a batch of validation samples to plot activations for
+for example in val_ds.take(1):
+  image_val, label_val = example[0], example[1]
+
+callbacks = [
+    ActivationsVisualizationCallback(
+        validation_data=(image_val, label_val),
+        layers_name=["last_layer"],
+        output_dir=visualizations_session_dir,
+    ),
+    tensorboard_callback
+]
+
+EPOCHS = 10
+
+model_history = model.fit(train_ds,
                    steps_per_epoch=int(np.ceil(num_train_examples / float(batch_size))),
                    epochs=EPOCHS,
                    validation_data=val_ds,
-                   validation_steps=int(np.ceil(num_val_examples / float(batch_size))))
+                   validation_steps=int(np.ceil(num_val_examples / float(batch_size))),
+                   callbacks=callbacks)
+
 
 loss = model_history.history['loss']
 val_loss = model_history.history['val_loss']
