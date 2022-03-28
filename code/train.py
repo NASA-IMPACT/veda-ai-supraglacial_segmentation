@@ -582,16 +582,19 @@ tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_fit_session_di
 for example in val_ds.take(1):
   image_val, label_val = example[0], example[1]
 
+early_stopping_callback = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+
 callbacks = [
     ActivationsVisualizationCallback(
         validation_data=(image_val, label_val),
         layers_name=["last_layer"],
         output_dir=visualizations_session_dir,
     ),
-    tensorboard_callback
+    tensorboard_callback,
+    early_stopping_callback
 ]
 
-EPOCHS = 10
+EPOCHS = 100
 
 model_history = model.fit(train_ds,
                    steps_per_epoch=int(np.ceil(num_train_examples / float(batch_size))),
@@ -600,15 +603,17 @@ model_history = model.fit(train_ds,
                    validation_steps=int(np.ceil(num_val_examples / float(batch_size))),
                    callbacks=callbacks)
 
-
 loss = model_history.history['loss']
 val_loss = model_history.history['val_loss']
 
 epochs = range(EPOCHS)
 
+final_epochs = len(model_history.history['loss'])
+print("final number of epochs: ", final_epochs)
+
 if (not os.path.isdir(workshop_dir)):
   os.mkdir(workshop_dir)
-save_model_path = os.path.join(workshop_dir,'model_out_batch_{}_ep{}_pretrain_focalloss/'.format(batch_size, EPOCHS))
+save_model_path = os.path.join(workshop_dir,'model_out_batch_{}_ep{}_earlystopping_pretrain_focalloss/'.format(batch_size, final_epochs))
 if (not os.path.isdir(save_model_path)):
   os.mkdir(save_model_path)
 model.save(save_model_path)
