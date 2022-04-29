@@ -4,12 +4,12 @@ from PIL import Image
 
 root_dir = '/home/ubuntu/data/'
 
-x_train_filenames_partition_fn = os.path.join(root_dir,'x_train_filenames_partition.txt')
-y_train_filenames_partition_fn = os.path.join(root_dir,'y_train_filenames_partition.txt')
-x_val_filenames_partition_fn = os.path.join(root_dir,'x_val_filenames_partition.txt')
-y_val_filenames_partition_fn = os.path.join(root_dir,'y_val_filenames_partition.txt')
-x_test_filenames_partition_fn = os.path.join(root_dir,'x_test_filenames_partition.txt')
-y_test_filenames_partition_fn = os.path.join(root_dir,'y_test_filenames_partition.txt')
+x_train_filenames_partition_fn = os.path.join(root_dir,'x_train_filenames_partition_filtered_07.txt')
+y_train_filenames_partition_fn = os.path.join(root_dir,'y_train_filenames_partition_filtered_07.txt')
+x_val_filenames_partition_fn = os.path.join(root_dir,'x_val_filenames_partition_filtered_07.txt')
+y_val_filenames_partition_fn = os.path.join(root_dir,'y_val_filenames_partition_filtered_07.txt')
+x_test_filenames_partition_fn = os.path.join(root_dir,'x_test_filenames_partition_filtered_07.txt')
+y_test_filenames_partition_fn = os.path.join(root_dir,'y_test_filenames_partition_filtered_07.txt')
 
 try:
   x_train_filenames = [line.strip() for line in open(x_train_filenames_partition_fn, 'r')]
