@@ -76,25 +76,54 @@ def get_train_test_lists(imdir, lbldir):
   print("number of images: ", len(dset_list))
   return dset_list, x_filenames, y_filenames
 
-train_list_fn = os.path.join(root_dir,"train_list.txt")
-x_train_filenames_fn = os.path.join(root_dir,'x_train_filenames.txt')
-y_train_filenames_fn = os.path.join(root_dir,'y_train_filenames.txt')
+train_list_fn = os.path.join(root_dir,"train_list_filtered_07.txt")
+x_train_filenames_fn = os.path.join(root_dir,'x_train_filenamesfiltered_07.txt')
+y_train_filenames_fn = os.path.join(root_dir,'y_train_filenamesfiltered_07.txt')
 
+bad_groundtruth_examples = [line.strip() for line in open(os.path.join(root_dir,"flagged_melt_pcts_fns.csv"), 'r')]
+
+# CODE USED FOR FILTERING
+"""
+x_train_filenames = []
+y_train_filenames = []
+
+for img_id in train_list_fn:
+    if "RDSISC4_{}_classified{}".format(img_id[:-4], img_id[-4:]) in bad_groundtruth_examples:
+        print("flagged image: ", img_id)
+        train_list.remove(img_id)
+    else:
+        continue
+    x_train_filenames.append(os.path.join(img_dir, "{}.png".format(img_id)))
+    y_train_filenames.append(os.path.join(label_dir, "RDSISC4_{}_classified{}.png".format(img_id[:-4], img_id[-4:])))
+
+with open(os.path.join(root_dir,'train_list_filtered_07.txt'), 'w') as f:
+   for item in train_list:
+       f.write("%s\n" % item)
+
+with open(os.path.join(root_dir,'x_train_filenames_filtered_07.txt'), 'w') as f:
+   for item in x_train_filenames:
+       f.write("%s\n" % item)
+
+with open(os.path.join(root_dir,'y_train_filenames_filtered_07.txt'), 'w') as f:
+   for item in y_train_filenames:
+       f.write("%s\n" % item)
+
+"""
 try:
-  train_list = [line.strip() for line in open(os.path.join(root_dir,"train_list.txt"), 'r')]
-  x_train_filenames = [line.strip() for line in open(os.path.join(root_dir,'x_train_filenames.txt'), 'r')]
-  y_train_filenames = [line.strip() for line in open(os.path.join(root_dir,'y_train_filenames.txt'), 'r')]
+  train_list = [line.strip() for line in open(train_list_fn, 'r')]
+  x_train_filenames = [line.strip() for line in open(x_train_filenames_fn, 'r')]
+  y_train_filenames = [line.strip() for line in open(y_train_filenames_fn, 'r')]
 except:
   train_list, x_train_filenames, y_train_filenames = get_train_test_lists(img_dir, label_dir)
-  with open(os.path.join(root_dir,'train_list.txt'), 'w') as f:
+  with open(os.path.join(root_dir,'train_list_filtered_07.txt'), 'w') as f:
     for item in train_list:
         f.write("%s\n" % item)
 
-  with open(os.path.join(root_dir,'x_train_filenames.txt'), 'w') as f:
+  with open(os.path.join(root_dir,'x_train_filenames_filtered_07.txt'), 'w') as f:
     for item in x_train_filenames:
         f.write("%s\n" % item)
 
-  with open(os.path.join(root_dir,'y_train_filenames.txt'), 'w') as f:
+  with open(os.path.join(root_dir,'y_train_filenames_filtered_07.txt'), 'w') as f:
     for item in y_train_filenames:
         f.write("%s\n" % item)
 
@@ -137,12 +166,12 @@ for i, img_id in zip(tqdm(range(len(train_list_clean))), train_list_clean):
 print("Number of background tiles: ", background_removal)
 print("Remaining number of tiles after 90% background removal: ", len(train_list_clean))
 
-x_train_filenames_partition_fn = os.path.join(root_dir,'x_train_filenames_partition.txt')
-y_train_filenames_partition_fn = os.path.join(root_dir,'y_train_filenames_partition.txt')
-x_val_filenames_partition_fn = os.path.join(root_dir,'x_val_filenames_partition.txt')
-y_val_filenames_partition_fn = os.path.join(root_dir,'y_val_filenames_partition.txt')
-x_test_filenames_partition_fn = os.path.join(root_dir,'x_test_filenames_partition.txt')
-y_test_filenames_partition_fn = os.path.join(root_dir,'y_test_filenames_partition.txt')
+x_train_filenames_partition_fn = os.path.join(root_dir,'x_train_filenames_partition_filtered_07.txt')
+y_train_filenames_partition_fn = os.path.join(root_dir,'y_train_filenames_partition_filtered_07.txt')
+x_val_filenames_partition_fn = os.path.join(root_dir,'x_val_filenames_partition_filtered_07.txt')
+y_val_filenames_partition_fn = os.path.join(root_dir,'y_val_filenames_partition_filtered_07.txt')
+x_test_filenames_partition_fn = os.path.join(root_dir,'x_test_filenames_partition_filtered_07.txt')
+y_test_filenames_partition_fn = os.path.join(root_dir,'y_test_filenames_partition_filtered_07.txt')
 
 try:
   x_train_filenames = [line.strip() for line in open(x_train_filenames_partition_fn, 'r')]
@@ -212,27 +241,27 @@ else:
 
 
 if not os.path.isfile(fn) for fn in [x_train_filenames_partition_fn, y_train_filenames_partition, x_val_filenames_partition, y_val_filenames_partition, x_test_filenames_partition, y_test_filenames_partition]:
-  with open(os.path.join(root_dir,'x_train_filenames_partition.txt'), 'w') as f:
+  with open(os.path.join(root_dir,'x_train_filenames_partition_filtered_07.txt'), 'w') as f:
     for item in x_train_filenames:
         f.write("%s\n" % item)
 
-  with open(os.path.join(root_dir,'y_train_filenames_partition.txt'), 'w') as f:
+  with open(os.path.join(root_dir,'y_train_filenames_partition_filtered_07.txt'), 'w') as f:
     for item in y_train_filenames:
         f.write("%s\n" % item)
 
-  with open(os.path.join(root_dir,'x_val_filenames_partition.txt'), 'w') as f:
+  with open(os.path.join(root_dir,'x_val_filenames_partition_filtered_07.txt'), 'w') as f:
     for item in x_val_filenames:
         f.write("%s\n" % item)
 
-  with open(os.path.join(root_dir,'y_val_filenames_partition.txt'), 'w') as f:
+  with open(os.path.join(root_dir,'y_val_filenames_partition_filtered_07.txt'), 'w') as f:
     for item in y_val_filenames:
         f.write("%s\n" % item)
 
-  with open(os.path.join(root_dir,'x_test_filenames_partition.txt'), 'w') as f:
+  with open(os.path.join(root_dir,'x_test_filenames_partition_filtered_07.txt'), 'w') as f:
     for item in x_test_filenames:
         f.write("%s\n" % item)
 
-  with open(os.path.join(root_dir,'y_test_filenames_partition.txt'), 'w') as f:
+  with open(os.path.join(root_dir,'y_test_filenames_partition_filtered_07.txt'), 'w') as f:
     for item in y_test_filenames:
         f.write("%s\n" % item)
 else:
@@ -302,26 +331,56 @@ def flip_img_v(vertical_flip, tr_img, label_img):
                                 lambda: (tr_img, label_img))
   return tr_img, label_img
 
+# Function to augment the data with contrast adjustment
+def adjust_contrast_img(contrast_adj, tr_img, contrast_range):
+  if contrast_adj:
+    contrast = np.random.uniform(contrast_range[0], contrast_range[1])
+
+    adj_prob = tf.random.uniform([], 0.0, 1.0)
+
+    tr_img = tf.cond(tf.less(adj_prob, 1.0), #0.5
+                                lambda: (tf.image.adjust_contrast(tr_img, contrast)),
+                                lambda: (tr_img))
+    #image = tf.image.adjust_contrast(images, contrast)
+  return tr_img
+
+# Function to augment the data with brightness adjustment
+def adjust_brightness_img(brightness_adj, tr_img, brightness_delta):
+  if brightness_adj:
+    brightness = np.random.uniform(brightness_delta[0], brightness_delta[1])
+
+    adj_prob = tf.random.uniform([], 0.0, 1.0)
+
+    tr_img = tf.cond(tf.less(adj_prob, 1.0), #0.5
+                                lambda: (tf.image.adjust_brightness(tr_img, brightness)),
+                                lambda: (tr_img))
+    #image = tf.image.adjust_brightness(images, brightness)
+  return tr_img
+
+# Function to augment the images and labels
 # Function to augment the images and labels
 def _augment(img,
              label_img,
              resize=None,  # Resize the image to some size e.g. [256, 256]
              scale=None,  # Scale image e.g. 1 / 255.
              horizontal_flip=False,
-             vertical_flip=False): 
+             vertical_flip=False,
+             contrast_adj =False,
+             brightness_adj=False,
+             contrast_range=[0.5, 1.5],
+             brightness_delta=[-0.2, 0.2]):
   if resize is not None:
     # Resize both images
     label_img = tf.image.resize(label_img, resize)
     img = tf.image.resize(img, resize)
-  
+
   img, label_img = flip_img_h(horizontal_flip, img, label_img)
   img, label_img = flip_img_v(vertical_flip, img, label_img)
-  img = tf.cast(img, tf.float32) 
+  img = adjust_contrast_img(contrast_adj, img, contrast_range)
+  img = adjust_brightness_img(brightness_adj, img, brightness_delta)
+  img = tf.cast(img, tf.float32)
   if scale is not None:
     img = tf.cast(img, tf.float32) * scale
-    #img = tf.keras.layers.Rescaling(scale=scale, offset=-1)
-  #label_img = tf.cast(label_img, tf.float32) * scale
-  #print("tensor: ", tf.unique(tf.keras.backend.print_tensor(label_img)))
   return img, label_img
 
 # Main function to tie all of the above four dataset processing functions together 
@@ -356,6 +415,8 @@ tr_cfg = {
     'scale': 1 / 255.,
     'horizontal_flip': True,
     'vertical_flip': True,
+    'contrast_adj': True,
+    'brightness_adj': True
 }
 tr_preprocessing_fn = functools.partial(_augment, **tr_cfg)
 

@@ -39,6 +39,48 @@ for i in range(0, len(pred_arr_lst)):
         pred_arr_lst_valid.append(pred_arr_lst[i])
         label_arr_lst_valid.append(label_arr_lst[i])
 
+# Compute per class IoU        
+def maskIOU(mask1, mask2, class_val):   # From the question.
+    mask1_area = np.count_nonzero(mask1 == int(class_val))
+    mask2_area = np.count_nonzero(mask2 == int(class_val))
+    intersection = np.count_nonzero(np.logical_and( mask1==int(class_val),  mask2==int(class_val) ))
+    try:
+        iou = intersection/(mask1_area+mask2_area-intersection)
+    except Exception as e:
+        print("couldn't compute iou because: ", e)
+        iou = 0
+    return iou
+
+iou_0 = []
+iou_1 = []
+iou_2 = []
+iou_3 = []
+iou_4 = []
+iou_5 = []
+
+
+for l, p in zip(label_arr_lst_valid, pred_arr_lst_valid):
+    iou0 = maskIOU(l, p, 0)
+    iou_0.append(iou0)
+    iou1 = maskIOU(l, p, 1)
+    iou_1.append(iou1)
+    iou2 = maskIOU(l, p, 2)
+    iou_2.append(iou2)
+    iou3 = maskIOU(l, p, 3)
+    iou_3.append(iou3)
+    iou4 = maskIOU(l, p, 4)
+    iou_4.append(iou4)
+    iou5 = maskIOU(l, p, 5)
+    iou_5.append(iou5)
+
+iou_avg_0 = np.mean(iou_0)
+iou_avg_1 = np.mean(iou_1)
+iou_avg_2 = np.mean(iou_2)
+iou_avg_3 = np.mean(iou_3)
+iou_avg_4 = np.mean(iou_4)
+iou_avg_5 = np.mean(iou_5)
+
+
 # flatten our tensors and use scikit-learn to create a confusion matrix
 flat_preds = np.concatenate(pred_arr_lst_valid).flatten()
 flat_truth = np.concatenate(label_arr_lst_valid).flatten()
@@ -84,4 +126,5 @@ f1 = f1_score(flat_truth, flat_preds, average='macro')
 
 print("cm: ", cm)
 print("f1: ", f1)
+print("iou_avg_0, iou_avg_1, iou_avg_2, iou_avg_3, iou_avg_4, iou_avg_5: ", iou_avg_0, iou_avg_1, iou_avg_2, iou_avg_3, iou_avg_4, iou_avg_5)
 

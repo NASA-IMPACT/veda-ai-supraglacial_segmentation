@@ -41,11 +41,11 @@ tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 print("physical devices: ", physical_devices)
 
-root_dir = '/home/ubuntu/data/'
+root_dir = '/home/ubuntu/'
 workshop_dir = '/home/ubuntu/models/'
 
-img_dir = os.path.join(root_dir,'tiled_images/')
-label_dir = os.path.join(root_dir,'tiled_labels/')
+img_dir = os.path.join(root_dir,'planetscope_color_corrected_gamma_darkened_cooled/')
+label_dir = os.path.join(root_dir,'planetscope_color_corrected_gamma_darkened_cooled/')
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
@@ -56,11 +56,10 @@ if gpus:
     except RuntimeError as e:
         print(e)
 
-x_test_filenames_partition_fn = os.path.join(root_dir,'x_test_filenames_partition_filtered_07.txt')
-y_test_filenames_partition_fn = os.path.join(root_dir,'y_test_filenames_partition_filtered_07.txt')
 
 def get_test_lists(imdir, lbldir):
   imgs = glob.glob(os.path.join(imdir,"*.png"))
+  #print(imgs[0:1])
   dset_list = []
   for img in imgs:
     filename_split = os.path.splitext(img) 
@@ -77,16 +76,12 @@ def get_test_lists(imdir, lbldir):
   print("number of images: ", len(dset_list))
   return dset_list, x_filenames, y_filenames
 
-if os.path.isfile(fn) for fn in [x_test_filenames_partition_fn, y_test_filenames_partition_fn]:
-  x_test_filenames = [line.strip() for line in open(x_test_filenames_partition_fn, 'r')]
-  y_test_filenames = [line.strip() for line in open(y_test_filenames_partition_fn, 'r')]
-else:
-  test_list, x_test_filenames, y_test_filenames = get_test_lists(img_dir, label_dir)
+test_list, x_test_filenames, y_test_filenames = get_test_lists(img_dir, label_dir)
 
 print("!!!!! number of images: ", len(x_test_filenames))
 
 # set input image shape
-img_shape = (96, 96, 3)
+img_shape = (224, 224, 3)
 # set batch size for model
 batch_size = 8
 
@@ -241,7 +236,7 @@ sample_image, sample_mask = batch_of_imgs[0], label[0,:,:,:]
 # Optional, you can load the model from the saved version
 load_from_checkpoint = True
 if load_from_checkpoint == True:
-  save_model_path = os.path.join(workshop_dir,'model_out_batch_{}_ep{}_pretrain_focalloss/'.format(batch_size, EPOCHS))
+  save_model_path = os.path.join(workshop_dir,'model_out_batch_{}_ep{}_nopretrain_focalloss/'.format(batch_size, EPOCHS))
   model = tf.keras.models.load_model(save_model_path, custom_objects={"loss": SparseCategoricalFocalLoss, "iou_score": iou_score})
 else:
   print("inferencing from in memory model")
@@ -264,7 +259,7 @@ def get_predictions(image= None, dataset=None, num=1):
     pred_mask = tf.keras.backend.eval(pred_mask)
     return pred_mask
 
-tiled_prediction_dir = os.path.join(root_dir,'predictions_test_focal_loss_batch_{}_ep{}/'.format(batch_size, EPOCHS))
+tiled_prediction_dir = os.path.join(root_dir,'predictions_test_focal_loss_planetscope_96_batch_{}_ep{}/'.format(batch_size, EPOCHS)) #'data/', 'predictions_test_focal_loss_planetscope/')
 if not os.path.exists(tiled_prediction_dir):
     os.makedirs(tiled_prediction_dir)
     
@@ -296,10 +291,14 @@ for i in range(0, len(x_test_filenames)):
     mask_int = tf.dtypes.cast(mask, tf.int32)
     true_masks.append(mask_int)
     print(y_test_filenames[img_num:img_num+1])
-    print(np.unique(mask_int))
+    #print(np.unique(mask_int))
 
-    # run and plot predictions
+    # run and plot predicitions, only showing every 27th prediction
+    #if img_num % 27 == 0:
+    #    show_predictions(image=image, mask=mask)
+    #show_predictions(image=image, mask=mask)
     pred_mask = get_predictions(image)
+    print(np.unique(pred_mask))
     pred_masks.append(pred_mask)
     
     # save prediction images to file
@@ -312,5 +311,5 @@ for i in range(0, len(x_test_filenames)):
     tf.keras.preprocessing.image.save_img(pred_path,pred_mask, scale=False) # scaling is good to do to cut down on file size, but adds an extra dtype conversion step.    
 
 path_df = pd.DataFrame(list(zip(x_test_filenames, y_test_filenames, pred_paths)), columns=["img_names", "label_names", "pred_names"])
-path_df.to_csv(os.path.join(root_dir, "test_file_paths_{}_ep{}.csv".format(batch_size, EPOCHS)))
+path_df.to_csv(os.path.join(root_dir, "test_file_paths_planetscope_96_{}_ep{}.csv".format(batch_size, EPOCHS)))
 
