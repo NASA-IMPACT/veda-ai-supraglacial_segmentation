@@ -65,9 +65,8 @@ def get_test_lists(imdir, lbldir):
   imgs = glob.glob(os.path.join(imdir,"*.png"))
   dset_list = []
   for img in imgs:
-    filename_split = os.path.splitext(img) 
-    filename_zero, fileext = filename_split 
-    basename = os.path.basename(filename_zero) 
+      file_name, file_ext = os.path.splittext(img)
+      basename = os.path.basename(file_name) 
     dset_list.append(basename)
 
   x_filenames = []
@@ -194,9 +193,8 @@ foreground_list_x = []
 foreground_list_y = []
 for x,y in zip(x_test_filenames, y_test_filenames): 
     try:
-      filename_split = os.path.splitext(y) 
-      filename_zero, fileext = filename_split 
-      basename = os.path.basename(filename_zero) 
+      file_name, file_ext = os.path.splittext(y)
+      basename = os.path.basename(file_name) 
       img = np.array(Image.open(y))
       if img.max()>0:
       #if basename not in background_list_train:
@@ -298,10 +296,8 @@ for i in range(0, len(x_test_filenames)):
     pred_masks.append(pred_mask)
     
     # save prediction images to file
-
-    filename_split = os.path.splitext(x_test_filenames[img_num]) 
-    filename_zero, fileext = filename_split 
-    basename = os.path.basename(filename_zero) 
+    file_name, file_ext = os.path.splittext(x_test_filenames[img_num])
+    basename = os.path.basename(file_name) 
     pred_path = os.path.join(tiled_prediction_dir, "{}.png".format(basename))
     pred_paths.append(pred_path)
     tf.keras.preprocessing.image.save_img(pred_path,pred_mask, scale=False) # scaling is good to do to cut down on file size, but adds an extra dtype conversion step.    

@@ -46,6 +46,8 @@ IMG_SHAPE = (96, 96, 3)
 BATCH_SIZE = 8
 # maximum number of epochs to let the model train for
 MAX_EPOCHS = 100
+# set number of model output channels to the number of classes (including background)
+OUTPUT_CHANNELS = 6
 
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
@@ -62,9 +64,8 @@ def get_train_test_lists(imdir, lbldir):
   imgs = glob.glob(os.path.join(imdir,"*.png"))
   dset_list = []
   for img in imgs:
-    filename_split = os.path.splitext(img) 
-    filename_zero, fileext = filename_split 
-    basename = os.path.basename(filename_zero) 
+      file_name, file_ext = os.path.splittext(img)
+      basename = os.path.basename(file_name) 
     dset_list.append(basename)
 
   x_filenames = []
@@ -275,9 +276,8 @@ foreground_list_x = []
 foreground_list_y = []
 for x,y in zip(x_train_filenames, y_train_filenames): 
     try:
-      filename_split = os.path.splitext(y) 
-      filename_zero, fileext = filename_split 
-      basename = os.path.basename(filename_zero) 
+      file_name, file_ext = os.path.splittext(y)
+      basename = os.path.basename(file_name) 
       if basename not in background_list_train:
         foreground_list_x.append(x)
         foreground_list_y.append(y)
@@ -471,9 +471,8 @@ foreground_list_x = []
 foreground_list_y = []
 for x,y in zip(x_val_filenames, y_val_filenames): 
     try:
-      filename_split = os.path.splitext(y) 
-      filename_zero, fileext = filename_split 
-      basename = os.path.basename(filename_zero) 
+      file_name, file_ext = os.path.splittext(y)
+      basename = os.path.basename(file_name) 
       if basename not in background_list_train:
         foreground_list_x.append(x)
         foreground_list_y.append(y)
@@ -511,9 +510,8 @@ foreground_list_x = []
 foreground_list_y = []
 for x,y in zip(x_test_filenames, y_test_filenames): 
     try:
-      filename_split = os.path.splitext(y) 
-      filename_zero, fileext = filename_split 
-      basename = os.path.basename(filename_zero) 
+      file_name, file_ext = os.path.splittext(y)
+      basename = os.path.basename(file_name) 
       if basename not in background_list_train:
         foreground_list_x.append(x)
         foreground_list_y.append(y)
@@ -546,10 +544,7 @@ batch_of_imgs, label = next_element
 
 sample_image, sample_mask = batch_of_imgs[0], label[0,:,:,:]
 
-# set number of model output channels to the number of classes (including background)
-OUTPUT_CHANNELS = 6
-
-base_model = tf.keras.applications.MobileNetV2(input_shape=[96, 96, 3], include_top=False)
+base_model = tf.keras.applications.MobileNetV2(input_shape=IMG_SHAPE, include_top=False)
 
 # Use the activations of these layers
 layer_names = [
