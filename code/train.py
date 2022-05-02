@@ -1,51 +1,49 @@
-import os, glob, functools, fnmatch, io, shutil, random
-from zipfile import ZipFile
+import datetime, os, fnmatch, functools, io, glob, random, shutil
 from itertools import product
+from time import sleep
+from zipfile import ZipFile
+
+from focal_loss import SparseCategoricalFocalLoss
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 from PIL import Image
 from sklearn.model_selection import train_test_split
-
+from sklearn.metrics import confusion_matrix, f1_score
+import skimage.io as skio
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-import rasterio
 from rasterio import features, mask
 
-import geopandas as gpd
-
+from segmentation_models.metrics import iou_score
 import tensorflow as tf
+import tensorflow_addons as tfa
+import tensorflow_datasets as tfds
+from tensorflow_examples.models.pix2pix import pix2pix
 from tensorflow.python.keras import layers, losses, models
 from tensorflow.python.keras import backend as K  
-import tensorflow_addons as tfa
-
-from tensorflow_examples.models.pix2pix import pix2pix
-from segmentation_models.metrics import iou_score
 from tf_explain.callbacks.activations_visualization import ActivationsVisualizationCallback
-
-import tensorflow_datasets as tfds
-tfds.disable_progress_bar()
-
-import datetime
-
-from focal_loss import SparseCategoricalFocalLoss
-from sklearn.metrics import confusion_matrix, f1_score
-import skimage.io as skio
-
-from time import sleep
 from tqdm.notebook import tqdm
+
+tfds.disable_progress_bar()
 
 physical_devices = tf.config.list_physical_devices('GPU') 
 tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 print("physical devices: ", physical_devices)
 
-root_dir = '/home/ubuntu/data/'
-workshop_dir = '/home/ubuntu/models/'
+ROOT_DIR = '/home/ubuntu/data/'
+OUTPUT_DIR = '/home/ubuntu/models/'
 
-img_dir = os.path.join(root_dir,'tiled_images/') 
-label_dir = os.path.join(root_dir,'tiled_labels/') 
+IMG_DIR = os.path.join(ROOT_DIR,'tiled_images/') 
+LABEL_DIR = os.path.join(ROOT_DIR,'tiled_labels/') 
+
+# input image shape
+IMG_SHAPE = (96, 96, 3)
+# batch size for model
+BATCH_SIZE = 8
 
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
@@ -76,11 +74,11 @@ def get_train_test_lists(imdir, lbldir):
   print("number of images: ", len(dset_list))
   return dset_list, x_filenames, y_filenames
 
-train_list_fn = os.path.join(root_dir,"train_list_filtered_07.txt")
-x_train_filenames_fn = os.path.join(root_dir,'x_train_filenamesfiltered_07.txt')
-y_train_filenames_fn = os.path.join(root_dir,'y_train_filenamesfiltered_07.txt')
+train_list_fn = os.path.join(ROOT_DIR,"train_list_filtered_07.txt")
+x_train_filenames_fn = os.path.join(ROOT_DIR,'x_train_filenamesfiltered_07.txt')
+y_train_filenames_fn = os.path.join(ROOT_DIR,'y_train_filenamesfiltered_07.txt')
 
-bad_groundtruth_examples = [line.strip() for line in open(os.path.join(root_dir,"flagged_melt_pcts_fns.csv"), 'r')]
+bad_groundtruth_examples = [line.strip() for line in open(os.path.join(ROOT_DIR,"flagged_melt_pcts_fns.csv"), 'r')]
 
 # CODE USED FOR FILTERING
 """
@@ -93,18 +91,18 @@ for img_id in train_list_fn:
         train_list.remove(img_id)
     else:
         continue
-    x_train_filenames.append(os.path.join(img_dir, "{}.png".format(img_id)))
-    y_train_filenames.append(os.path.join(label_dir, "RDSISC4_{}_classified{}.png".format(img_id[:-4], img_id[-4:])))
+    x_train_filenames.append(os.path.join(IMG_DIR, "{}.png".format(img_id)))
+    y_train_filenames.append(os.path.join(LABEL_DIR, "RDSISC4_{}_classified{}.png".format(img_id[:-4], img_id[-4:])))
 
-with open(os.path.join(root_dir,'train_list_filtered_07.txt'), 'w') as f:
+with open(os.path.join(ROOT_DIR,'train_list_filtered_07.txt'), 'w') as f:
    for item in train_list:
        f.write("%s\n" % item)
 
-with open(os.path.join(root_dir,'x_train_filenames_filtered_07.txt'), 'w') as f:
+with open(os.path.join(ROOT_DIR,'x_train_filenames_filtered_07.txt'), 'w') as f:
    for item in x_train_filenames:
        f.write("%s\n" % item)
 
-with open(os.path.join(root_dir,'y_train_filenames_filtered_07.txt'), 'w') as f:
+with open(os.path.join(ROOT_DIR,'y_train_filenames_filtered_07.txt'), 'w') as f:
    for item in y_train_filenames:
        f.write("%s\n" % item)
 
@@ -114,16 +112,16 @@ try:
   x_train_filenames = [line.strip() for line in open(x_train_filenames_fn, 'r')]
   y_train_filenames = [line.strip() for line in open(y_train_filenames_fn, 'r')]
 except:
-  train_list, x_train_filenames, y_train_filenames = get_train_test_lists(img_dir, label_dir)
-  with open(os.path.join(root_dir,'train_list_filtered_07.txt'), 'w') as f:
+  train_list, x_train_filenames, y_train_filenames = get_train_test_lists(IMG_DIR, LABEL_DIR)
+  with open(os.path.join(ROOT_DIR,'train_list_filtered_07.txt'), 'w') as f:
     for item in train_list:
         f.write("%s\n" % item)
 
-  with open(os.path.join(root_dir,'x_train_filenames_filtered_07.txt'), 'w') as f:
+  with open(os.path.join(ROOT_DIR,'x_train_filenames_filtered_07.txt'), 'w') as f:
     for item in x_train_filenames:
         f.write("%s\n" % item)
 
-  with open(os.path.join(root_dir,'y_train_filenames_filtered_07.txt'), 'w') as f:
+  with open(os.path.join(ROOT_DIR,'y_train_filenames_filtered_07.txt'), 'w') as f:
     for item in y_train_filenames:
         f.write("%s\n" % item)
 
@@ -137,19 +135,19 @@ if not skip:
   background_list_train = []
   for i in train_list: 
       # read in each labeled images
-      img = np.array(Image.open(os.path.join(label_dir,"RDSISC4_{}_classified{}.png".format(i[:-4], i[-4:]))))  
+      img = np.array(Image.open(os.path.join(LABEL_DIR,"RDSISC4_{}_classified{}.png".format(i[:-4], i[-4:]))))  
       # check if no values in image are greater than zero (background value)
       if img.max()==0:
           background_list_train.append(i)
 
   print("Number of background images: ", len(background_list_train))
 
-  with open(os.path.join(root_dir,'background_list_train.txt'), 'w') as f:
+  with open(os.path.join(ROOT_DIR,'background_list_train.txt'), 'w') as f:
     for item in background_list_train:
         f.write("%s\n" % item)
 
 else:
-  background_list_train = [line.strip() for line in open(os.path.join(root_dir,"background_list_train.txt"), 'r')]
+  background_list_train = [line.strip() for line in open(os.path.join(ROOT_DIR,"background_list_train.txt"), 'r')]
   print("Number of background images: ", len(background_list_train))
 
 background_removal = len(background_list_train) * 0.9
@@ -160,18 +158,18 @@ y_train_filenames = []
 
 for i, img_id in zip(tqdm(range(len(train_list_clean))), train_list_clean):
   pass 
-  x_train_filenames.append(os.path.join(img_dir, "{}.png".format(img_id)))
-  y_train_filenames.append(os.path.join(label_dir, "RDSISC4_{}_classified{}.png".format(img_id[:-4], img_id[-4:])))
+  x_train_filenames.append(os.path.join(IMG_DIR, "{}.png".format(img_id)))
+  y_train_filenames.append(os.path.join(LABEL_DIR, "RDSISC4_{}_classified{}.png".format(img_id[:-4], img_id[-4:])))
 
 print("Number of background tiles: ", background_removal)
 print("Remaining number of tiles after 90% background removal: ", len(train_list_clean))
 
-x_train_filenames_partition_fn = os.path.join(root_dir,'x_train_filenames_partition_filtered_07.txt')
-y_train_filenames_partition_fn = os.path.join(root_dir,'y_train_filenames_partition_filtered_07.txt')
-x_val_filenames_partition_fn = os.path.join(root_dir,'x_val_filenames_partition_filtered_07.txt')
-y_val_filenames_partition_fn = os.path.join(root_dir,'y_val_filenames_partition_filtered_07.txt')
-x_test_filenames_partition_fn = os.path.join(root_dir,'x_test_filenames_partition_filtered_07.txt')
-y_test_filenames_partition_fn = os.path.join(root_dir,'y_test_filenames_partition_filtered_07.txt')
+x_train_filenames_partition_fn = os.path.join(ROOT_DIR,'x_train_filenames_partition_filtered_07.txt')
+y_train_filenames_partition_fn = os.path.join(ROOT_DIR,'y_train_filenames_partition_filtered_07.txt')
+x_val_filenames_partition_fn = os.path.join(ROOT_DIR,'x_val_filenames_partition_filtered_07.txt')
+y_val_filenames_partition_fn = os.path.join(ROOT_DIR,'y_val_filenames_partition_filtered_07.txt')
+x_test_filenames_partition_fn = os.path.join(ROOT_DIR,'x_test_filenames_partition_filtered_07.txt')
+y_test_filenames_partition_fn = os.path.join(ROOT_DIR,'y_test_filenames_partition_filtered_07.txt')
 
 try:
   x_train_filenames = [line.strip() for line in open(x_train_filenames_partition_fn, 'r')]
@@ -226,8 +224,8 @@ else:
 
     for i, img_id in zip(tqdm(range(len(train_list_clean))), train_list_clean):
         pass
-        x_train_filenames.append(os.path.join(img_dir, "{}.png".format(img_id)))
-        y_train_filenames.append(os.path.join(label_dir, "RDSISC4_{}_classified{}.png".format(img_id[:-4], img_id[-4:])))
+        x_train_filenames.append(os.path.join(IMG_DIR, "{}.png".format(img_id)))
+        y_train_filenames.append(os.path.join(LABEL_DIR, "RDSISC4_{}_classified{}.png".format(img_id[:-4], img_id[-4:])))
     seed = random.randint(1, 100)
     x_train_filenames, x_val_filenames, y_train_filenames, y_val_filenames = train_test_split(x_train_filenames, y_train_filenames, test_size=0.3, random_state=seed)
     x_val_filenames, x_test_filenames, y_val_filenames, y_test_filenames = train_test_split(x_val_filenames, y_val_filenames, test_size=0.33, random_state=seed)
@@ -241,33 +239,33 @@ else:
 
 
 if not os.path.isfile(fn) for fn in [x_train_filenames_partition_fn, y_train_filenames_partition, x_val_filenames_partition, y_val_filenames_partition, x_test_filenames_partition, y_test_filenames_partition]:
-  with open(os.path.join(root_dir,'x_train_filenames_partition_filtered_07.txt'), 'w') as f:
+  with open(os.path.join(ROOT_DIR,'x_train_filenames_partition_filtered_07.txt'), 'w') as f:
     for item in x_train_filenames:
         f.write("%s\n" % item)
 
-  with open(os.path.join(root_dir,'y_train_filenames_partition_filtered_07.txt'), 'w') as f:
+  with open(os.path.join(ROOT_DIR,'y_train_filenames_partition_filtered_07.txt'), 'w') as f:
     for item in y_train_filenames:
         f.write("%s\n" % item)
 
-  with open(os.path.join(root_dir,'x_val_filenames_partition_filtered_07.txt'), 'w') as f:
+  with open(os.path.join(ROOT_DIR,'x_val_filenames_partition_filtered_07.txt'), 'w') as f:
     for item in x_val_filenames:
         f.write("%s\n" % item)
 
-  with open(os.path.join(root_dir,'y_val_filenames_partition_filtered_07.txt'), 'w') as f:
+  with open(os.path.join(ROOT_DIR,'y_val_filenames_partition_filtered_07.txt'), 'w') as f:
     for item in y_val_filenames:
         f.write("%s\n" % item)
 
-  with open(os.path.join(root_dir,'x_test_filenames_partition_filtered_07.txt'), 'w') as f:
+  with open(os.path.join(ROOT_DIR,'x_test_filenames_partition_filtered_07.txt'), 'w') as f:
     for item in x_test_filenames:
         f.write("%s\n" % item)
 
-  with open(os.path.join(root_dir,'y_test_filenames_partition_filtered_07.txt'), 'w') as f:
+  with open(os.path.join(ROOT_DIR,'y_test_filenames_partition_filtered_07.txt'), 'w') as f:
     for item in y_test_filenames:
         f.write("%s\n" % item)
 else:
   continue
 
-background_list_train = [line.strip() for line in open(os.path.join(root_dir,"background_list_train.txt"), 'r')]
+background_list_train = [line.strip() for line in open(os.path.join(ROOT_DIR,"background_list_train.txt"), 'r')]
 
 display_num = 3
 # select only for tiles with foreground labels present
@@ -290,11 +288,6 @@ num_foreground_examples = len(foreground_list_y)
 
 # randomlize the choice of image and label pairs
 r_choices = np.random.choice(num_foreground_examples, display_num)
-
-# set input image shape
-img_shape = (96, 96, 3)
-# set batch size for model
-batch_size = 8
 
 # Function for reading the tiles into TensorFlow tensors 
 # See TensorFlow documentation for explanation of tensor: https://www.tensorflow.org/guide/tensor
@@ -388,7 +381,7 @@ def get_baseline_dataset(filenames,
                          labels,
                          preproc_fn=functools.partial(_augment),
                          threads=5, 
-                         batch_size=batch_size,
+                         batch_size=BATCH_SIZE,
                          shuffle=True):           
   num_x = len(filenames)
   # Create a dataset from the filenames and labels
@@ -397,7 +390,7 @@ def get_baseline_dataset(filenames,
   # advantage of multithreading
   dataset = dataset.map(_process_pathnames, num_parallel_calls=threads)
   if preproc_fn.keywords is not None and 'resize' not in preproc_fn.keywords:
-    assert batch_size == 1, "Batching images must be of the same size"
+    assert BATCH_SIZE == 1, "Batching images must be of the same size"
 
   dataset = dataset.map(preproc_fn, num_parallel_calls=threads)
   
@@ -406,12 +399,12 @@ def get_baseline_dataset(filenames,
   
   
   # It's necessary to repeat our data for all epochs 
-  dataset = dataset.repeat().batch(batch_size)
+  dataset = dataset.repeat().batch(BATCH_SIZE)
   return dataset
 
 # dataset configuration for training
 tr_cfg = {
-    'resize': [img_shape[0], img_shape[1]],
+    'resize': [IMG_SHAPE[0], IMG_SHAPE[1]],
     'scale': 1 / 255.,
     'horizontal_flip': True,
     'vertical_flip': True,
@@ -422,14 +415,14 @@ tr_preprocessing_fn = functools.partial(_augment, **tr_cfg)
 
 # dataset configuration for validation
 val_cfg = {
-    'resize': [img_shape[0], img_shape[1]],
+    'resize': [IMG_SHAPE[0], IMG_SHAPE[1]],
     'scale': 1 / 255.,
 }
 val_preprocessing_fn = functools.partial(_augment, **val_cfg)
 
 # dataset configuration for testing
 test_cfg = {
-    'resize': [img_shape[0], img_shape[1]],
+    'resize': [IMG_SHAPE[0], IMG_SHAPE[1]],
     'scale': 1 / 255.,
 }
 test_preprocessing_fn = functools.partial(_augment, **test_cfg)
@@ -438,15 +431,15 @@ test_preprocessing_fn = functools.partial(_augment, **test_cfg)
 train_ds = get_baseline_dataset(x_train_filenames,
                                 y_train_filenames,
                                 preproc_fn=tr_preprocessing_fn,
-                                batch_size=batch_size)
+                                batch_size=BATCH_SIZE)
 val_ds = get_baseline_dataset(x_val_filenames,
                               y_val_filenames, 
                               preproc_fn=val_preprocessing_fn,
-                              batch_size=batch_size)
+                              batch_size=BATCH_SIZE)
 test_ds = get_baseline_dataset(x_test_filenames,
                               y_test_filenames, 
                               preproc_fn=test_preprocessing_fn,
-                              batch_size=batch_size)
+                              batch_size=BATCH_SIZE)
 
 # Now we will display some samples from the datasets
 display_num = 1
@@ -618,11 +611,11 @@ def create_mask(pred_mask):
 
 # Tensorboard
 
-log_dir = os.path.join(workshop_dir,'logs/')
-log_fit_dir = os.path.join(workshop_dir,'logs', 'fit')
-log_fit_session_dir = os.path.join(workshop_dir,'logs', 'fit', datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
-visualizations_dir = os.path.join(workshop_dir,'logs', 'vizualizations')
-visualizations_session_dir = os.path.join(workshop_dir,'logs', 'vizualizations', datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+log_dir = os.path.join(OUTPUT_DIR,'logs/')
+log_fit_dir = os.path.join(OUTPUT_DIR,'logs', 'fit')
+log_fit_session_dir = os.path.join(OUTPUT_DIR,'logs', 'fit', datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
+visualizations_dir = os.path.join(OUTPUT_DIR,'logs', 'vizualizations')
+visualizations_session_dir = os.path.join(OUTPUT_DIR,'logs', 'vizualizations', datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 
 dirs = [log_fit_dir, visualizations_dir]
 for dir in dirs:
@@ -658,10 +651,10 @@ callbacks = [
 EPOCHS = 100
 
 model_history = model.fit(train_ds,
-                   steps_per_epoch=int(np.ceil(num_train_examples / float(batch_size))),
+                   steps_per_epoch=int(np.ceil(num_train_examples / float(BATCH_SIZE))),
                    epochs=EPOCHS,
                    validation_data=val_ds,
-                   validation_steps=int(np.ceil(num_val_examples / float(batch_size))),
+                   validation_steps=int(np.ceil(num_val_examples / float(BATCH_SIZE))),
                    callbacks=callbacks)
 
 loss = model_history.history['loss']
@@ -674,7 +667,7 @@ print("final number of epochs: ", final_epochs)
 
 if (not os.path.isdir(workshop_dir)):
   os.mkdir(workshop_dir)
-save_model_path = os.path.join(workshop_dir,'model_out_batch_{}_ep{}_earlystopping_pretrain_focalloss/'.format(batch_size, final_epochs))
+save_model_path = os.path.join(OUTPUT_DIR,'model_out_batch_{}_ep{}_earlystopping_pretrain_focalloss/'.format(BATCH_SIZE, final_epochs))
 if (not os.path.isdir(save_model_path)):
   os.mkdir(save_model_path)
 model.save(save_model_path)

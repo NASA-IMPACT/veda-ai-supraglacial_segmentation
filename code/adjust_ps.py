@@ -7,15 +7,11 @@ from PIL import Image
 import skimage.io as skio
 from skimage import exposure
 
+ROOT_DIR = '/home/ubuntu/'
+IMG_DIR = os.path.join(root_dir,'planetscope/')
 
-
-root_dir = '/home/ubuntu/'
-img_dir = os.path.join(root_dir,'planetscope/')
-label_dir = os.path.join(root_dir,'planetscope/')
-
-def get_test_lists(imdir, lbldir):
+def get_test_lists(imdir):
   imgs = glob.glob(os.path.join(imdir,"*.png"))
-  #print(imgs[0:1])
   dset_list = []
   for img in imgs:
     filename_split = os.path.splitext(img)
@@ -24,20 +20,15 @@ def get_test_lists(imdir, lbldir):
     dset_list.append(basename)
 
   x_filenames = []
-  y_filenames = []
   for img_id in dset_list:
     x_filenames.append(os.path.join(imdir, "{}.png".format(img_id)))
-    y_filenames.append(os.path.join(lbldir, "{}.png".format(img_id)))
 
   print("number of images: ", len(dset_list))
-  return dset_list, x_filenames, y_filenames
+  return x_filenames
 
-test_list, x_test_filenames, y_test_filenames = get_test_lists(img_dir, label_dir)
+x_test_filenames = get_test_lists(IMG_DIR, LABEL_DIR)
 
 print("!!!!! number of images: ", len(x_test_filenames))
-
-# set input image shape
-img_shape = (96, 96, 3)
 
 kelvin_table = {
     1000: (255,56,0),

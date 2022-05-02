@@ -1,13 +1,12 @@
-import os, glob, functools, fnmatch
-from zipfile import ZipFile
+import os, fnmatch, functools, glob
 from itertools import product
+from zipfile import ZipFile
 
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-#mpl.rcParams['axes.grid'] = False
-#mpl.rcParams['figure.figsize'] = (12,12)
 import matplotlib.image as mpimg
+import numpy as np
+
 import pandas as pd
 from PIL import Image
 import geopandas as gpd
@@ -17,8 +16,8 @@ from time import sleep
 import skimage.io as skio # lighter dependency than tensorflow for working with our tensors/arrays
 from sklearn.metrics import confusion_matrix, f1_score
 
-root_dir = '/home/ubuntu/data/'
-path_df = pd.read_csv(os.path.join(root_dir, "test_file_paths.csv"))
+ROOT_DIR = '/home/ubuntu/data/'
+path_df = pd.read_csv(os.path.join(ROOT_DIR, "test_file_paths.csv"))
 
 # reading in preds
 label_arr_lst = path_df["label_names"].apply(skio.imread)
@@ -118,7 +117,7 @@ for i in range(cm.shape[0]):
 fig.tight_layout(pad=2.0, h_pad=2.0, w_pad=2.0)
 ax.set_ylim(len(classes)-0.5, -0.5)
 
-plt.savefig(f'{root_dir}cm.png')
+plt.savefig(f'{ROOT_DIR}cm.png')
 
 
 # compute f1 score
