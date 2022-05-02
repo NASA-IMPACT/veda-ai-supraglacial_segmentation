@@ -44,6 +44,8 @@ LABEL_DIR = os.path.join(ROOT_DIR,'tiled_labels/')
 IMG_SHAPE = (96, 96, 3)
 # batch size for model
 BATCH_SIZE = 8
+# maximum number of epochs to let the model train for
+MAX_EPOCHS = 100
 
 os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
 
@@ -648,11 +650,9 @@ callbacks = [
     early_stopping_callback
 ]
 
-EPOCHS = 100
-
 model_history = model.fit(train_ds,
                    steps_per_epoch=int(np.ceil(num_train_examples / float(BATCH_SIZE))),
-                   epochs=EPOCHS,
+                   epochs=MAX_EPOCHS,
                    validation_data=val_ds,
                    validation_steps=int(np.ceil(num_val_examples / float(BATCH_SIZE))),
                    callbacks=callbacks)
@@ -660,13 +660,11 @@ model_history = model.fit(train_ds,
 loss = model_history.history['loss']
 val_loss = model_history.history['val_loss']
 
-epochs = range(EPOCHS)
-
 final_epochs = len(model_history.history['loss'])
 print("final number of epochs: ", final_epochs)
 
-if (not os.path.isdir(workshop_dir)):
-  os.mkdir(workshop_dir)
+if (not os.path.isdir(OUTPUT_DIR)):
+  os.mkdir(OUTPUT_DIR)
 save_model_path = os.path.join(OUTPUT_DIR,'model_out_batch_{}_ep{}_earlystopping_pretrain_focalloss/'.format(BATCH_SIZE, final_epochs))
 if (not os.path.isdir(save_model_path)):
   os.mkdir(save_model_path)
