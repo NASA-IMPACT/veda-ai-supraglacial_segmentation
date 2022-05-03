@@ -12,14 +12,14 @@ x_test_filenames_partition_fn = os.path.join(ROOT_DIR,'x_test_filenames_partitio
 y_test_filenames_partition_fn = os.path.join(ROOT_DIR,'y_test_filenames_partition_filtered_07.txt')
 
 try:
-  x_train_filenames = [line.strip() for line in open(x_train_filenames_partition_fn, 'r')]
-  y_train_filenames = [line.strip() for line in open(y_train_filenames_partition_fn, 'r')]
-  x_val_filenames = [line.strip() for line in open(x_val_filenames_partition_fn, 'r')]
-  y_val_filenames = [line.strip() for line in open(y_val_filenames_partition_fn, 'r')]
-  x_test_filenames = [line.strip() for line in open(x_test_filenames_partition_fn, 'r')]
-  y_test_filenames = [line.strip() for line in open(y_test_filenames_partition_fn, 'r')]
+    x_train_filenames = [line.strip() for line in open(x_train_filenames_partition_fn, 'r')]
+    y_train_filenames = [line.strip() for line in open(y_train_filenames_partition_fn, 'r')]
+    x_val_filenames = [line.strip() for line in open(x_val_filenames_partition_fn, 'r')]
+    y_val_filenames = [line.strip() for line in open(y_val_filenames_partition_fn, 'r')]
+    x_test_filenames = [line.strip() for line in open(x_test_filenames_partition_fn, 'r')]
+    y_test_filenames = [line.strip() for line in open(y_test_filenames_partition_fn, 'r')]
 except:
-  print("partition files do not exist")
+    print("partition files do not exist")
 
 
 x_train_filenames_d = [d[53:63] for d in x_train_filenames]
