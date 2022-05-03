@@ -11,20 +11,20 @@ ROOT_DIR = '/home/ubuntu/'
 IMG_DIR = os.path.join(root_dir,'planetscope/')
 
 def get_test_lists(imdir):
-  imgs = glob.glob(os.path.join(imdir,"*.png"))
-  dset_list = []
-  for img in imgs:
-    filename_split = os.path.splitext(img)
-    filename_zero, fileext = filename_split
-    basename = os.path.basename(filename_zero)
-    dset_list.append(basename)
+    imgs = glob.glob(os.path.join(imdir,"*.png"))
+    dset_list = []
+    for img in imgs:
+      filename_split = os.path.splitext(img)
+      filename_zero, fileext = filename_split
+      basename = os.path.basename(filename_zero)
+      dset_list.append(basename)
 
-  x_filenames = []
-  for img_id in dset_list:
-    x_filenames.append(os.path.join(imdir, "{}.png".format(img_id)))
+    x_filenames = []
+    for img_id in dset_list:
+        x_filenames.append(os.path.join(imdir, "{}.png".format(img_id)))
 
-  print("number of images: ", len(dset_list))
-  return x_filenames
+    print("number of images: ", len(dset_list))
+    return x_filenames
 
 x_test_filenames = get_test_lists(IMG_DIR, LABEL_DIR)
 
@@ -72,4 +72,4 @@ def adjust_planet_image(image):
     skio.imsave('{}_gamma_corrected_cooled9500K.png'.format(image[:-4]), gamma_corrected)
 
 for i in x_test_filenames:
-  adjust_planet_image(i)
+    adjust_planet_image(i)
