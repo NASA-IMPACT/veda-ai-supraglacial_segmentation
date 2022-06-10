@@ -58,8 +58,8 @@ if gpus:
     except RuntimeError as e:
         print(e)
 
-x_test_filenames_partition_fn = os.path.join(ROOT_DIR,'x_test_filenames_partition_filtered_07.txt')
-y_test_filenames_partition_fn = os.path.join(ROOT_DIR,'y_test_filenames_partition_filtered_07.txt')
+x_test_filenames_partition_fn = os.path.join(ROOT_DIR,'x_test_filenames_partition_manual_qa.txt')
+y_test_filenames_partition_fn = os.path.join(ROOT_DIR,'y_test_filenames_partition_manual_qa.txt')
 
 def get_test_lists(imdir, lbldir):
     imgs = glob.glob(os.path.join(imdir,"*.png"))

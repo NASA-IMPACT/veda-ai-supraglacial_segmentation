@@ -77,9 +77,9 @@ def get_train_test_lists(imdir, lbldir):
     print("number of images: ", len(dset_list))
     return dset_list, x_filenames, y_filenames
 
-train_list_fn = os.path.join(ROOT_DIR,"train_list_filtered_07.txt")
-x_train_filenames_fn = os.path.join(ROOT_DIR,'x_train_filenamesfiltered_07.txt')
-y_train_filenames_fn = os.path.join(ROOT_DIR,'y_train_filenamesfiltered_07.txt')
+train_list_fn = os.path.join(ROOT_DIR,"train_list.txt")
+x_train_filenames_fn = os.path.join(ROOT_DIR,'x_train_filenames.txt')
+y_train_filenames_fn = os.path.join(ROOT_DIR,'y_train_filenames.txt')
 
 bad_groundtruth_examples = [line.strip() for line in open(os.path.join(ROOT_DIR,"flagged_melt_pcts_fns.csv"), 'r')]
 
@@ -97,15 +97,15 @@ for img_id in train_list_fn:
     x_train_filenames.append(os.path.join(IMG_DIR, "{}.png".format(img_id)))
     y_train_filenames.append(os.path.join(LABEL_DIR, "RDSISC4_{}_classified{}.png".format(img_id[:-4], img_id[-4:])))
 
-with open(os.path.join(ROOT_DIR,'train_list_filtered_07.txt'), 'w') as f:
+with open(os.path.join(ROOT_DIR,'train_list_manual_qa.txt'), 'w') as f:
    for item in train_list:
        f.write("%s\n" % item)
 
-with open(os.path.join(ROOT_DIR,'x_train_filenames_filtered_07.txt'), 'w') as f:
+with open(os.path.join(ROOT_DIR,'x_train_filenames_manual_qa.txt'), 'w') as f:
    for item in x_train_filenames:
        f.write("%s\n" % item)
 
-with open(os.path.join(ROOT_DIR,'y_train_filenames_filtered_07.txt'), 'w') as f:
+with open(os.path.join(ROOT_DIR,'y_train_filenames_manual_qa.txt'), 'w') as f:
    for item in y_train_filenames:
        f.write("%s\n" % item)
 
@@ -116,15 +116,15 @@ try:
     y_train_filenames = [line.strip() for line in open(y_train_filenames_fn, 'r')]
 except:
     train_list, x_train_filenames, y_train_filenames = get_train_test_lists(IMG_DIR, LABEL_DIR)
-    with open(os.path.join(ROOT_DIR,'train_list_filtered_07.txt'), 'w') as f:
+    with open(os.path.join(ROOT_DIR,'train_list_manual_qa.txt'), 'w') as f:
         for item in train_list:
             f.write("%s\n" % item)
 
-    with open(os.path.join(ROOT_DIR,'x_train_filenames_filtered_07.txt'), 'w') as f:
+    with open(os.path.join(ROOT_DIR,'x_train_filenames_manual_qa.txt'), 'w') as f:
         for item in x_train_filenames:
             f.write("%s\n" % item)
 
-    with open(os.path.join(ROOT_DIR,'y_train_filenames_filtered_07.txt'), 'w') as f:
+    with open(os.path.join(ROOT_DIR,'y_train_filenames_manual_qa.txt'), 'w') as f:
         for item in y_train_filenames:
             f.write("%s\n" % item)
 

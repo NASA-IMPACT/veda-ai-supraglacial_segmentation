@@ -117,13 +117,14 @@ for i in range(cm.shape[0]):
 fig.tight_layout(pad=2.0, h_pad=2.0, w_pad=2.0)
 ax.set_ylim(len(classes)-0.5, -0.5)
 
-plt.savefig(f'{ROOT_DIR}cm.png')
+plt.savefig(f'{ROOT_DIR}/cm.png')
 
-
-# compute f1 score
+# compute F1 score
+labels=[0,1,2,3,4]
 f1 = f1_score(flat_truth, flat_preds, average='macro')
-
+f1_scores = f1_score(flat_truth, flat_preds, average=None, labels=labels)
+f1_scores_with_labels = {label:score for label,score in zip(labels, f1_scores)}
+print("f1 scores with labels: ", f1_scores_with_labels)
+print("overall f1 score: ", f1)
 print("cm: ", cm)
-print("f1: ", f1)
-print("iou_avg_0, iou_avg_1, iou_avg_2, iou_avg_3, iou_avg_4, iou_avg_5: ", iou_avg_0, iou_avg_1, iou_avg_2, iou_avg_3, iou_avg_4, iou_avg_5)
-
+print("iou_avg_0, iou_avg_1, iou_avg_2, iou_avg_3, iou_avg_4: ", iou_avg_0, iou_avg_1, iou_avg_2, iou_avg_3, iou_avg_4)
