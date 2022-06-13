@@ -4,12 +4,12 @@ from PIL import Image
 
 ROOT_DIR = '/home/ubuntu/data/'
 
-x_train_filenames_partition_fn = os.path.join(ROOT_DIR,'x_train_filenames_partition_filtered_07.txt')
-y_train_filenames_partition_fn = os.path.join(ROOT_DIR,'y_train_filenames_partition_filtered_07.txt')
-x_val_filenames_partition_fn = os.path.join(ROOT_DIR,'x_val_filenames_partition_filtered_07.txt')
-y_val_filenames_partition_fn = os.path.join(ROOT_DIR,'y_val_filenames_partition_filtered_07.txt')
-x_test_filenames_partition_fn = os.path.join(ROOT_DIR,'x_test_filenames_partition_filtered_07.txt')
-y_test_filenames_partition_fn = os.path.join(ROOT_DIR,'y_test_filenames_partition_filtered_07.txt')
+x_train_filenames_partition_fn = os.path.join(ROOT_DIR,'x_train_filenames_partition_manual_qa.txt')
+y_train_filenames_partition_fn = os.path.join(ROOT_DIR,'y_train_filenames_partition_manual_qa.txt')
+x_val_filenames_partition_fn = os.path.join(ROOT_DIR,'x_val_filenames_partition_manual_qa.txt')
+y_val_filenames_partition_fn = os.path.join(ROOT_DIR,'y_val_filenames_partition_manual_qa.txt')
+x_test_filenames_partition_fn = os.path.join(ROOT_DIR,'x_test_filenames_partition_manual_qa.txt')
+y_test_filenames_partition_fn = os.path.join(ROOT_DIR,'y_test_filenames_partition_manual_qa.txt')
 
 try:
     x_train_filenames = [line.strip() for line in open(x_train_filenames_partition_fn, 'r')]
@@ -21,6 +21,7 @@ try:
 except:
     print("partition files do not exist")
 
+train_list = [line.strip() for line in open(os.path.join(root_dir,"train_list_manual_qa.txt"), 'r')]
 
 x_train_filenames_d = [d[53:63] for d in x_train_filenames]
 x_val_filenames_d = [d[53:63] for d in x_val_filenames]
@@ -62,6 +63,32 @@ def get_class_counts_partitions(partition_list, c0,c1,c2,c3,c4,c5):
             print("count for class 5: ", color_count_dict[5])
             c5+=color_count_dict[5]
         return c0,c1,c2,c3,c4,c5
+
+def get_class_pcts_partitions(partition_list):
+    for i in partition_list:
+        img = np.array(Image.open(i))
+        colors, counts = np.unique(img, return_counts = True)
+        color_count_dict = dict(zip(colors, counts))
+        print(color_count_dict)
+        if 0 in colors:
+            pct_0 = float(color_count_dict[0])/img.size
+            pcts_0.append((i, color_count_dict[0]))
+        if 1 in colors:
+            pct_1 = float(color_count_dict[1])/img.size
+            pcts_1.append((i, color_count_dict[1]))
+        if 2 in colors:
+            pct_2 = float(color_count_dict[2])/img.size
+            pcts_2.append((i, color_count_dict[2]))
+        if 3 in colors:
+            pct_3 = float(color_count_dict[3])/img.size
+            pcts_3.append((i, color_count_dict[3]))
+        if 4 in colors:
+            pct_4 = float(color_count_dict[4])/img.size
+            pcts_4.append((i, color_count_dict[4]))
+        if 5 in colors:
+            pct_5 = float(color_count_dict[5])/img.size
+            pcts_5.append((i, color_count_dict[5]))
+    return
 
 def get_class_rgb_ranges_partitions(partition_list_x, partition_list_y, r0,r1,r2,r3,r4,r5, g0,g1,g2,g3,g4,g5, b0,b1,b2,b3,b4,b5):
     for i, y in zip(partition_list_x, partition_list_y):
@@ -128,6 +155,97 @@ def get_class_rgb_ranges_partitions(partition_list_x, partition_list_y, r0,r1,r2
                 g5.append(g5v)
                 b5.append(b5v)
         return 
+
+pcts_0 = []
+pcts_1 = []
+pcts_2 = []
+pcts_3 = []
+pcts_4 = []
+pcts_5 = []
+
+all_0_count, all_1_count, all_2_count, all_3_count, all_4_count, all_5_count = 0,0,0,0,0,0
+all_0_count, all_1_count, all_2_count, all_3_count, all_4_count, all_5_count = get_class_counts_pcts_partitions(y_train_filenames, all_0_count, all_1_count, all_2_count, all_3_count, all_4_count, all_5_count)
+
+df0 = pd.DataFrame(pcts_0, columns=['image', 'percent_0'])
+df1 = pd.DataFrame(pcts_1, columns=['image', 'percent_1'])
+df2 = pd.DataFrame(pcts_2, columns=['image', 'percent_2'])
+df3 = pd.DataFrame(pcts_3, columns=['image', 'percent_3'])
+df4 = pd.DataFrame(pcts_4, columns=['image', 'percent_4'])
+df5 = pd.DataFrame(pcts_5, columns=['image', 'percent_5'])
+
+df0 = df0.loc[~df0.index.duplicated(keep='first')]
+df1 = df1.loc[~df1.index.duplicated(keep='first')]
+df2 = df2.loc[~df2.index.duplicated(keep='first')]
+df3 = df3.loc[~df3.index.duplicated(keep='first')]
+df4 = df4.loc[~df4.index.duplicated(keep='first')]
+df5 = df5.loc[~df5.index.duplicated(keep='first')]
+
+print("TRAIN length of df0: ", len(df0), "length of df1: ", len(df1), "length of df2: ", len(df2), "length of df3: ", len(df3), "length of df4: ", len(df4), "length of df5: ", len(df5))
+
+df_all = pd.concat([i.set_index('image') for i in [df0,df1,df2,df3,df4]],axis=1, join='outer')
+df_all = df_all.reset_index(drop=True)
+
+df_all.to_csv('images_class_cnts_manual_qa_train.csv')
+
+pcts_0 = []
+pcts_1 = []
+pcts_2 = []
+pcts_3 = []
+pcts_4 = []
+pcts_5 = []
+
+all_0_count, all_1_count, all_2_count, all_3_count, all_4_count, all_5_count = 0,0,0,0,0,0
+all_0_count, all_1_count, all_2_count, all_3_count, all_4_count, all_5_count = get_class_counts_pcts_partitions(y_val_filenames, all_0_count, all_1_count, all_2_count, all_3_count, all_4_count, all_5_count)
+
+df0 = pd.DataFrame(pcts_0, columns=['image', 'percent_0'])
+df1 = pd.DataFrame(pcts_1, columns=['image', 'percent_1'])
+df2 = pd.DataFrame(pcts_2, columns=['image', 'percent_2'])
+df3 = pd.DataFrame(pcts_3, columns=['image', 'percent_3'])
+df4 = pd.DataFrame(pcts_4, columns=['image', 'percent_4'])
+df5 = pd.DataFrame(pcts_5, columns=['image', 'percent_5'])
+
+df0 = df0.loc[~df0.index.duplicated(keep='first')]
+df1 = df1.loc[~df1.index.duplicated(keep='first')]
+df2 = df2.loc[~df2.index.duplicated(keep='first')]
+df3 = df3.loc[~df3.index.duplicated(keep='first')]
+df4 = df4.loc[~df4.index.duplicated(keep='first')]
+df5 = df5.loc[~df5.index.duplicated(keep='first')]
+
+print("VAL length of df0: ", len(df0), "length of df1: ", len(df1), "length of df2: ", len(df2), "length of df3: ", len(df3), "length of df4: ", len(df4), "length of df5: ", len(df5))
+
+df_all = pd.concat([i.set_index('image') for i in [df0,df1,df2,df3,df4]],axis=1, join='outer').reset_index(drop=True) 
+
+df_all.to_csv('images_class_cnts_manual_qa_val.csv')
+
+pcts_0 = []
+pcts_1 = []
+pcts_2 = []
+pcts_3 = []
+pcts_4 = []
+pcts_5 = []
+
+all_0_count, all_1_count, all_2_count, all_3_count, all_4_count, all_5_count = 0,0,0,0,0,0
+all_0_count, all_1_count, all_2_count, all_3_count, all_4_count, all_5_count = get_class_counts_pcts_partitions(y_test_filenames, all_0_count, all_1_count, all_2_count, all_3_count, all_4_count, all_5_count)
+
+df0 = pd.DataFrame(pcts_0, columns=['image', 'percent_0'])
+df1 = pd.DataFrame(pcts_1, columns=['image', 'percent_1'])
+df2 = pd.DataFrame(pcts_2, columns=['image', 'percent_2'])
+df3 = pd.DataFrame(pcts_3, columns=['image', 'percent_3'])
+df4 = pd.DataFrame(pcts_4, columns=['image', 'percent_4'])
+df5 = pd.DataFrame(pcts_5, columns=['image', 'percent_5'])
+
+df0 = df0.loc[~df0.index.duplicated(keep='first')]
+df1 = df1.loc[~df1.index.duplicated(keep='first')]
+df2 = df2.loc[~df2.index.duplicated(keep='first')]
+df3 = df3.loc[~df3.index.duplicated(keep='first')]
+df4 = df4.loc[~df4.index.duplicated(keep='first')]
+df5 = df5.loc[~df5.index.duplicated(keep='first')]
+
+print("TEST length of df0: ", len(df0), "length of df1: ", len(df1), "length of df2: ", len(df2), "length of df3: ", len(df3), "length of df4: ", len(df4), "length of df5: ", len(df5))
+
+df_all = pd.concat([i.set_index('image') for i in [df0,df1,df2,df3,df4]],axis=1, join='outer').reset_index(drop=True) 
+df_all.to_csv('images_class_cnts_manual_qa_test.csv')
+
 
 train_0_count, train_1_count, train_2_count, train_3_count, train_4_count, train_5_count = 0,0,0,0,0,0
 val_0_count, val_1_count, val_2_count, val_3_count, val_4_count, val_5_count = 0,0,0,0,0,0
