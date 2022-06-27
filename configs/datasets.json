@@ -1,0 +1,10 @@
+{"ROOT_DIR": "/home/ubuntu/data/", 
+    "train_filenames": "train_list_manual_qa.txt",
+    "x_train_filenames_partition": "x_train_filenames_partition_manual_qa.txt", 
+    "y_train_filenames_partition": "y_train_filenames_partition_manual_qa.txt",
+    "x_val_filenames_partition": "x_val_filenames_partition_manual_qa.txt",
+    "y_val_filenames_partition": "y_val_filenames_partition_manual_qa.txt",
+    "x_test_filenames_partition": "x_test_filenames_partition_manual_qa.txt",
+    "y_test_filenames_partition": "y_test_filenames_partition_manual_qa.txt" 
+    }
+
