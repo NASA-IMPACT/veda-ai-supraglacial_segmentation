@@ -1,4 +1,4 @@
-import datetime, os, fnmatch, functools, io, glob, random, shutil
+import datetime, os, fnmatch, functools, io, glob, random, shutil, json
 from itertools import product
 from time import sleep
 from zipfile import ZipFile
@@ -34,11 +34,14 @@ tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 print("physical devices: ", physical_devices)
 
-ROOT_DIR = '/home/ubuntu/data/'
+with open("../configs/datasets.json", "r") as f:
+    datasets = json.load(f)
+
+ROOT_DIR = datasets['ROOT_DIR']
 OUTPUT_DIR = '/home/ubuntu/models/'
 
-IMG_DIR = os.path.join(ROOT_DIR,'tiled_images/') 
-LABEL_DIR = os.path.join(ROOT_DIR,'tiled_labels/') 
+IMG_DIR = os.path.join(ROOT_DIR, datasets['icebridge_image_dir/']) 
+LABEL_DIR = os.path.join(ROOT_DIR,datasets['icebridge_label_dir/']) 
 
 # input image shape
 IMG_SHAPE = (96, 96, 3)
@@ -77,9 +80,9 @@ def get_train_test_lists(imdir, lbldir):
     print("number of images: ", len(dset_list))
     return dset_list, x_filenames, y_filenames
 
-train_list_fn = os.path.join(ROOT_DIR,"train_list.txt")
-x_train_filenames_fn = os.path.join(ROOT_DIR,'x_train_filenames.txt')
-y_train_filenames_fn = os.path.join(ROOT_DIR,'y_train_filenames.txt')
+train_list_fn = os.path.join(ROOT_DIR,datasets['train_filenames'])
+x_train_filenames_fn = os.path.join(ROOT_DIR,datasets['x_filenames'])
+y_train_filenames_fn = os.path.join(ROOT_DIR,datasets['y_filenames'])
 
 bad_groundtruth_examples = [line.strip() for line in open(os.path.join(ROOT_DIR,"flagged_melt_pcts_fns.csv"), 'r')]
 
@@ -116,15 +119,15 @@ try:
     y_train_filenames = [line.strip() for line in open(y_train_filenames_fn, 'r')]
 except:
     train_list, x_train_filenames, y_train_filenames = get_train_test_lists(IMG_DIR, LABEL_DIR)
-    with open(os.path.join(ROOT_DIR,'train_list_manual_qa.txt'), 'w') as f:
+    with open(os.path.join(ROOT_DIR,datasets['train_filenames']), 'w') as f:
         for item in train_list:
             f.write("%s\n" % item)
 
-    with open(os.path.join(ROOT_DIR,'x_train_filenames_manual_qa.txt'), 'w') as f:
+    with open(os.path.join(ROOT_DIR,datasets['x_filenames']), 'w') as f:
         for item in x_train_filenames:
             f.write("%s\n" % item)
 
-    with open(os.path.join(ROOT_DIR,'y_train_filenames_manual_qa.txt'), 'w') as f:
+    with open(os.path.join(ROOT_DIR,datasets['y_filenames']), 'w') as f:
         for item in y_train_filenames:
             f.write("%s\n" % item)
 
@@ -145,12 +148,12 @@ if not skip:
 
     print("Number of background images: ", len(background_list_train))
 
-    with open(os.path.join(ROOT_DIR,'background_list_train.txt'), 'w') as f:
+    with open(os.path.join(ROOT_DIR,datasets['background_files']), 'w') as f:
         for item in background_list_train:
             f.write("%s\n" % item)
 
 else:
-    background_list_train = [line.strip() for line in open(os.path.join(ROOT_DIR,"background_list_train.txt"), 'r')]
+    background_list_train = [line.strip() for line in open(os.path.join(ROOT_DIR,datasets['background_files']), 'r')]
     print("Number of background images: ", len(background_list_train))
 
 background_removal = len(background_list_train) * 0.9
@@ -167,12 +170,12 @@ for i, img_id in zip(tqdm(range(len(train_list_clean))), train_list_clean):
 print("Number of background tiles: ", background_removal)
 print("Remaining number of tiles after 90% background removal: ", len(train_list_clean))
 
-x_train_filenames_partition_fn = os.path.join(ROOT_DIR,'x_train_filenames_partition_filtered_07.txt')
-y_train_filenames_partition_fn = os.path.join(ROOT_DIR,'y_train_filenames_partition_filtered_07.txt')
-x_val_filenames_partition_fn = os.path.join(ROOT_DIR,'x_val_filenames_partition_filtered_07.txt')
-y_val_filenames_partition_fn = os.path.join(ROOT_DIR,'y_val_filenames_partition_filtered_07.txt')
-x_test_filenames_partition_fn = os.path.join(ROOT_DIR,'x_test_filenames_partition_filtered_07.txt')
-y_test_filenames_partition_fn = os.path.join(ROOT_DIR,'y_test_filenames_partition_filtered_07.txt')
+x_train_filenames_partition_fn = os.path.join(ROOT_DIR,datasets['x_train_filenames_partition'])
+y_train_filenames_partition_fn = os.path.join(ROOT_DIR,datasets['y_train_filenames_partition'])
+x_val_filenames_partition_fn = os.path.join(ROOT_DIR,datasets['x_val_filenames_partition'])
+y_val_filenames_partition_fn = os.path.join(ROOT_DIR,datasets['y_val_filenames_partition'])
+x_test_filenames_partition_fn = os.path.join(ROOT_DIR,datasets['x_test_filenames_partition'])
+y_test_filenames_partition_fn = os.path.join(ROOT_DIR,datasets['y_test_filenames_partition'])
 
 try:
     x_train_filenames = [line.strip() for line in open(x_train_filenames_partition_fn, 'r')]
@@ -242,33 +245,33 @@ else:
 
 
 if not os.path.isfile(fn) for fn in [x_train_filenames_partition_fn, y_train_filenames_partition, x_val_filenames_partition, y_val_filenames_partition, x_test_filenames_partition, y_test_filenames_partition]:
-    with open(os.path.join(ROOT_DIR,'x_train_filenames_partition_filtered_07.txt'), 'w') as f:
+    with open(os.path.join(ROOT_DIR,datasets['x_train_filenames_partition']), 'w') as f:
         for item in x_train_filenames:
             f.write("%s\n" % item)
 
-    with open(os.path.join(ROOT_DIR,'y_train_filenames_partition_filtered_07.txt'), 'w') as f:
+    with open(os.path.join(ROOT_DIR,datasets['y_train_filenames_partition']), 'w') as f:
         for item in y_train_filenames:
             f.write("%s\n" % item)
 
-    with open(os.path.join(ROOT_DIR,'x_val_filenames_partition_filtered_07.txt'), 'w') as f:
+    with open(os.path.join(ROOT_DIR,datasets['x_val_filenames_partition']), 'w') as f:
         for item in x_val_filenames:
             f.write("%s\n" % item)
 
-    with open(os.path.join(ROOT_DIR,'y_val_filenames_partition_filtered_07.txt'), 'w') as f:
+    with open(os.path.join(ROOT_DIR,datasets['y_val_filenames_partition']), 'w') as f:
         for item in y_val_filenames:
             f.write("%s\n" % item)
 
-    with open(os.path.join(ROOT_DIR,'x_test_filenames_partition_filtered_07.txt'), 'w') as f:
+    with open(os.path.join(ROOT_DIR,datasets['x_test_filenames_partition']), 'w') as f:
         for item in x_test_filenames:
             f.write("%s\n" % item)
 
-    with open(os.path.join(ROOT_DIR,'y_test_filenames_partition_filtered_07.txt'), 'w') as f:
+    with open(os.path.join(ROOT_DIR,datasets['y_test_filenames_partition']), 'w') as f:
         for item in y_test_filenames:
             f.write("%s\n" % item)
 else:
     continue
 
-background_list_train = [line.strip() for line in open(os.path.join(ROOT_DIR,"background_list_train.txt"), 'r')]
+background_list_train = [line.strip() for line in open(os.path.join(ROOT_DIR,datasets['background_files']), 'r')]
 
 display_num = 3
 # select only for tiles with foreground labels present

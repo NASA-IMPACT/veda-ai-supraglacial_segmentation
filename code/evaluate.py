@@ -12,31 +12,21 @@ from PIL import Image
 import geopandas as gpd
 from IPython.display import clear_output
 from time import sleep
+from utils.read_data import get_image_label_arrays
 
 import skimage.io as skio # lighter dependency than tensorflow for working with our tensors/arrays
 from sklearn.metrics import confusion_matrix, f1_score
 
-ROOT_DIR = '/home/ubuntu/data/'
-path_df = pd.read_csv(os.path.join(ROOT_DIR, "test_file_paths.csv"))
+with open("../configs/datasets.json", "r") as f:
+    datasets = json.load(f)
+
+path_df = pd.read_csv(os.path.join(datasets['ROOT_DIR'], "test_file_paths.csv"))
 
 # reading in preds
 label_arr_lst = path_df["label_names"].apply(skio.imread)
 pred_arr_lst = path_df["pred_names"].apply(skio.imread)
 
-pred_arr_lst_valid = []
-label_arr_lst_valid = []
-for i in range(0, len(pred_arr_lst)):
-    if pred_arr_lst[i].shape != label_arr_lst[i].shape:
-        
-        print(f"The {i}th label has an incorrect dimension, skipping.")
-        print(pred_arr_lst[i])
-        print(label_arr_lst[i])
-        print(pred_arr_lst[i].shape)
-        print(label_arr_lst[i].shape)
-        
-    else:
-        pred_arr_lst_valid.append(pred_arr_lst[i])
-        label_arr_lst_valid.append(label_arr_lst[i])
+pred_arr_lst_valid, label_arr_lst_valid = get_image_label_arrays(path_df)
 
 # Compute per class IoU        
 def maskIOU(mask1, mask2, class_val):   # From the question.
@@ -117,7 +107,7 @@ for i in range(cm.shape[0]):
 fig.tight_layout(pad=2.0, h_pad=2.0, w_pad=2.0)
 ax.set_ylim(len(classes)-0.5, -0.5)
 
-plt.savefig(f'{ROOT_DIR}/cm.png')
+plt.savefig(f'{datasets['ROOT_DIR']}/cm.png')
 
 # compute F1 score
 labels=[0,1,2,3,4]

@@ -6,31 +6,15 @@ import pandas as pd
 from PIL import Image
 import skimage.io as skio
 from skimage import exposure
+import json
+from utils.read_data import get_test_lists
 
-ROOT_DIR = '/home/ubuntu/'
-IMG_DIR = os.path.join(root_dir,'planetscope/')
+with open("../configs/datasets.json", "r") as f:
+    datasets = json.load(f)
 
-def get_test_lists(imdir):
-    imgs = glob.glob(os.path.join(imdir,"*.png"))
-    dset_list = []
-    for img in imgs:
-      filename_split = os.path.splitext(img)
-      filename_zero, fileext = filename_split
-      basename = os.path.basename(filename_zero)
-      dset_list.append(basename)
+IMG_DIR = os.path.join(datasets['ROOT_DIR'],datasets['planetscope_filenames'])
 
-    x_filenames = []
-    for img_id in dset_list:
-        x_filenames.append(os.path.join(imdir, "{}.png".format(img_id)))
-
-    print("number of images: ", len(dset_list))
-    return x_filenames
-
-x_test_filenames = get_test_lists(IMG_DIR, LABEL_DIR)
-
-print("!!!!! number of images: ", len(x_test_filenames))
-
-kelvin_table = {
+KELVIN_TABLE = {
     1000: (255,56,0),
     1500: (255,109,0),
     2000: (255,137,18),
@@ -51,6 +35,10 @@ kelvin_table = {
     9500: (208,222,255),
     10000: (204,219,255)}
 
+x_test_filenames = get_test_lists(IMG_DIR, LABEL_DIR)
+
+print("!!!!! number of images: ", len(x_test_filenames))
+
 def adjust_planet_image(image):
     # Load an example image
     img = skio.imread(image)
@@ -69,7 +57,7 @@ def adjust_planet_image(image):
         return np.array(image.convert('RGB', matrix))
 
     gamma_corrected = convert_temp(gamma_corrected, 9500)
-    skio.imsave('{}_gamma_corrected_cooled9500K.png'.format(image[:-4]), gamma_corrected)
+    skio.imsave('{}_gamma_corrected_{}K.png'.format(image[:-4],temp), gamma_corrected)
 
 for i in x_test_filenames:
     adjust_planet_image(i)

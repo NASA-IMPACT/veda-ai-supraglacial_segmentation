@@ -1,4 +1,4 @@
-import datetime, os, fnmatch, functools, io, glob, random, shutil
+import datetime, os, fnmatch, functools, io, glob, random, shutil, json
 from itertools import product
 from time import sleep
 from zipfile import ZipFile
@@ -34,11 +34,14 @@ tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 print("physical devices: ", physical_devices)
 
-ROOT_DIR = '/home/ubuntu/data/'
+with open("../configs/datasets.json", "r") as f:
+    datasets = json.load(f)
+
+ROOT_DIR = datasets['ROOT_DIR']
 OUTPUT_DIR = '/home/ubuntu/models/'
 
-IMG_DIR = os.path.join(ROOT_DIR,'tiled_images/') 
-LABEL_DIR = os.path.join(ROOT_DIR,'tiled_labels/') 
+IMG_DIR = os.path.join(ROOT_DIR, datasets['icebridge_image_dir/']) 
+LABEL_DIR = os.path.join(ROOT_DIR,datasets['icebridge_label_dir/']) 
 
 # input image shape
 IMG_SHAPE = (96, 96, 3)
@@ -58,8 +61,8 @@ if gpus:
     except RuntimeError as e:
         print(e)
 
-x_test_filenames_partition_fn = os.path.join(ROOT_DIR,'x_test_filenames_partition_manual_qa.txt')
-y_test_filenames_partition_fn = os.path.join(ROOT_DIR,'y_test_filenames_partition_manual_qa.txt')
+x_test_filenames_partition_fn = os.path.join(ROOT_DIR,datasets['x_test_filenames_partition'])
+y_test_filenames_partition_fn = os.path.join(ROOT_DIR,datasets['y_test_filenames_partition'])
 
 def get_test_lists(imdir, lbldir):
     imgs = glob.glob(os.path.join(imdir,"*.png"))
