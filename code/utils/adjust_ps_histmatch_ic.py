@@ -1,7 +1,7 @@
 import os, glob
 import numpy as np
 import skimage.io as skio
-from skimage.exposure import match_histograms
+from skimage.exposure import match_histograms, adjust_log
 from skimage.color import rgb2ycbcr, ycbcr2rgb
 
 
@@ -25,6 +25,7 @@ def hist_match(image, reference, out_dir):
     reference = rgb2ycbcr(reference, channel_axis=-1)
     matched = match_histograms(img, reference, channel_axis=-1, multichannel=True)
     matched = ycbcr2rgb(matched, channel_axis=-1)
+    matched = adjust_log(matched, 1)
     skio.imsave(f'{out_dir}/{basename}.png', matched)
     return matched
 
