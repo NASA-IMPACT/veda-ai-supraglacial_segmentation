@@ -47,29 +47,12 @@ def random_sample(gtpath, predpath, outpath, number_tiles, number_pixels):
         img_gt = img.copy()
 
         img_ps = img1.copy()
-        print(np.unique(img_gt), np.unique(img_ps))
-
-        cg = 0
-        cp = 0
 
         for i in coords:
-            if i not in coords50:
-                img_gt[i[1],i[0]] = 0
-                cg+=1
-
+            img_gt[i[1],i[0]] = 0
 
         for i in coords:
-            if i not in coords50:
-                img_ps[i[1],i[0]] = 0
-                cp+=1
-
-        print("cg,cp: ", cg,cp)
-        cgp = len(coords) - cg
-        cpp = len(coords) - cp
-
-        print("cgp, cpp: ", cgp, cpp)
-
-        print(np.unique(img_gt), np.unique(img_ps))
+            img_ps[i[1],i[0]] = 0
 
         with open(outpath+basename+'_coords_icebridge.txt', 'w') as file_handler:
             for item in coords200:
