@@ -1,6 +1,5 @@
 import glob, io, os
 import numpy as np
-from PIL import Image
 
 BLUE_THRESH = 220
 
@@ -15,14 +14,10 @@ def mask_blue(image_nominal, image_pred):
     Returns:
         img_pred (nd.array): The prediction image array, masked as needed.
     """
-    filename_split = os.path.splitext(image) 
-    filename_zero, fileext = filename_split 
-    basename = os.path.basename(filename_zero) 
-    #print(basename)
     if 3 in np.unique(image_pred):
         r,g,b = np.dsplit(image_nominal,image_nominal.shape[-1])
         img_pred = np.expand_dims(image_pred, axis=2)
-        img_pred[np.where((img_pred == 3) & (b <= 220))] = 0
+        img_pred[np.where((img_pred == 3) & (b <= BLUE_THRESH))] = 0
 
     else:
         img_pred = image_pred
