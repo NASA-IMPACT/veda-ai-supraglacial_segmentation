@@ -1,8 +1,8 @@
 import glob, io, os
 import numpy as np
 
-BLUE_THRESH = 220
-NDWI_THRESH = 20
+BLUE_THRESH = 50
+NDWI_THRESH = 0.3
 NIR_THRESH = 3000
 
 def mask(img_thresh, img_pred, thresh):
