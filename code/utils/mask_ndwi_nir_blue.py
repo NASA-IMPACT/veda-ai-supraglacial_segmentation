@@ -14,8 +14,8 @@ def mask_ndwi_nir_blue(image_rgb, image_nir, image_pred, mask_type='nir'):
     """Takes a [r,g,b] image (pre-histogram matching) and masks areas of its prediction counterpart where 
     pixels are detected as melt pond but do not exceed a certain intensity in the threshold channel.
     Args:
-        image_rgb (nd.array): A 3 channel [r,g,b] image (pre-histogram matching).
-        image_nir (nd.array): A single channel [nir] image (pre-histogram matching).
+        image_rgb (nd.array): A 3 channel [r,g,b] uint16 image (pre-histogram matching).
+        image_nir (nd.array): A single channel [nir] uint16 image (pre-histogram matching).
         image_pred (nd.array): The corresponding single channel prediction image. Can be derived from a
         histogram matched counterpart.
         mask_type (string): Which information will be used to threshold and mask rocky pixels. Options
