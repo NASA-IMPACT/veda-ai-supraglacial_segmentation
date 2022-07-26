@@ -1,9 +1,9 @@
 import glob, io, os
 import numpy as np
 
-BLUE_THRESH = 50
-NDWI_THRESH = 0.3
-NIR_THRESH = 3000
+#BLUE_THRESH = 50
+#NDWI_THRESH = 0.3
+#NIR_THRESH = 3000
 
 def mask(img_thresh, img_pred, thresh):
     img_pred[np.where((img_pred == 3) & (img_thresh >= thresh))] = 0
@@ -26,14 +26,27 @@ def mask_ndwi_nir_blue(image_rgb, image_nir, image_pred, mask_type='nir'):
     if 3 in np.unique(image_pred):
         if mask_type == ndwi:
             r,g,b = np.dsplit(image_nominal,image_nominal.shape[-1])
+            
             img_ndwi = ((g-image_nir))/((g+image_nir))
-            img_pred = mask(img_ndwi, img_pred, NDWI_THRESH)
-        elif mask_type == nir:
-            img_pred = mask(image_nir, img_pred, NIR_THRESH)
+            ndwi_thresh = image_ndwi.max() * 0.1
+            if ndwi_thresh < image_ndwi.min():
+                range_ndwi = image_ndwi.max() - image_ndwi.min()
+                ndwi_thresh = image_ndwi.max() - (0.9 * range_ndwi) 
+            img_pred = mask(img_ndwi, image_pred, ndwi_thresh)
+        elif mask_type == nir: 
+            nirthresh = image_nir.max() * 0.1
+            if nirthresh < image_nir.min():
+                range_nir = image_nir.max() - image_nir.min()
+                nir_thresh = image_nir.max() - (0.9 * range_nir)
+            img_pred = mask(image_nir, img_pred, nir_thresh)
         elif mask_type == blue:
             r,g,b = np.dsplit(image_nominal,image_nominal.shape[-1])
+            blue_thresh = b.max() * 0.1
+            if blue_thresh < b.min():
+                range_blue = b.max() - b.min()
+                blue_thresh = b.max() - (0.9 * range_blue) 
             img_pred = np.expand_dims(image_pred, axis=2)
-            img_pred = mask(b, img_pred, BLUE_THRESH)
+            img_pred = mask(b, img_pred, blue_thresh)
         else:
             img_pred = image_pred
     else:
