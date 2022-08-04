@@ -37,7 +37,7 @@ def random_sample(gtpath, predpath, outpath, number_tiles, number_pixels):
         X,Y = np.where(im[...,0]>=0)
         coords = np.column_stack((X,Y))
         np.random.shuffle(coords)
-        coords50 = coords[0:number_pixels]
+        coordsn = coords[0:number_pixels]
         coords = coords[number_pixels:]
 
         img = np.array(Image.open(gtpath+basename1+'.png'))
@@ -55,7 +55,7 @@ def random_sample(gtpath, predpath, outpath, number_tiles, number_pixels):
             img_ps[i[1],i[0]] = 0
 
         with open(outpath+basename+'_coords_icebridge.txt', 'w') as file_handler:
-            for item in coords200:
+            for item in coordsn:
                 file_handler.write("{}\n".format(item))
 
         img_gt1 = Image.fromarray(img_gt)
