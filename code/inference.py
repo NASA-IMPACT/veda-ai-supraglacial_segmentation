@@ -27,6 +27,8 @@ from tensorflow.python.keras import backend as K
 from tf_explain.callbacks.activations_visualization import ActivationsVisualizationCallback
 from tqdm.notebook import tqdm
 
+from utils import read_data
+
 tfds.disable_progress_bar()
 
 physical_devices = tf.config.list_physical_devices('GPU') 
@@ -64,28 +66,11 @@ if gpus:
 x_test_filenames_partition_fn = os.path.join(ROOT_DIR,datasets['x_test_filenames_partition'])
 y_test_filenames_partition_fn = os.path.join(ROOT_DIR,datasets['y_test_filenames_partition'])
 
-def get_test_lists(imdir, lbldir):
-    imgs = glob.glob(os.path.join(imdir,"*.png"))
-    dset_list = []
-    for img in imgs:
-        file_name, file_ext = os.path.splittext(img)
-        basename = os.path.basename(file_name) 
-        dset_list.append(basename)
-
-    x_filenames = []
-    y_filenames = []
-    for img_id in dset_list:
-        x_filenames.append(os.path.join(imdir, "{}.png".format(img_id)))
-        y_filenames.append(os.path.join(lbldir, "{}.png".format(img_id)))
-
-    print("number of images: ", len(dset_list))
-    return dset_list, x_filenames, y_filenames
-
 if os.path.isfile(fn) for fn in [x_test_filenames_partition_fn, y_test_filenames_partition_fn]:
     x_test_filenames = [line.strip() for line in open(x_test_filenames_partition_fn, 'r')]
     y_test_filenames = [line.strip() for line in open(y_test_filenames_partition_fn, 'r')]
 else:
-    test_list, x_test_filenames, y_test_filenames = get_test_lists(IMG_DIR, LABEL_DIR)
+    test_list, x_test_filenames, y_test_filenames = read_data.get_test_lists_planetscope(IMG_DIR, LABEL_DIR)
 
 print("!!!!! number of images: ", len(x_test_filenames))
 

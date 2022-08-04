@@ -27,6 +27,8 @@ from tensorflow.python.keras import backend as K
 from tf_explain.callbacks.activations_visualization import ActivationsVisualizationCallback
 from tqdm.notebook import tqdm
 
+from utils import read_data
+
 tfds.disable_progress_bar()
 
 physical_devices = tf.config.list_physical_devices('GPU') 
@@ -63,22 +65,6 @@ if gpus:
     except RuntimeError as e:
         print(e)
 
-def get_train_test_lists(imdir, lbldir):
-    imgs = glob.glob(os.path.join(imdir,"*.png"))
-    dset_list = []
-    for img in imgs:
-        file_name, file_ext = os.path.splittext(img)
-        basename = os.path.basename(file_name) 
-        dset_list.append(basename)
-
-    x_filenames = []
-    y_filenames = []
-    for img_id in dset_list:
-        x_filenames.append(os.path.join(imdir, "{}.png".format(img_id)))
-        y_filenames.append(os.path.join(lbldir, "RDSISC4_{}_classified{}.png".format(img_id[:-4], img_id[-4:])))
-
-    print("number of images: ", len(dset_list))
-    return dset_list, x_filenames, y_filenames
 
 train_list_fn = os.path.join(ROOT_DIR,datasets['train_filenames'])
 x_train_filenames_fn = os.path.join(ROOT_DIR,datasets['x_filenames'])
@@ -118,7 +104,7 @@ try:
     x_train_filenames = [line.strip() for line in open(x_train_filenames_fn, 'r')]
     y_train_filenames = [line.strip() for line in open(y_train_filenames_fn, 'r')]
 except:
-    train_list, x_train_filenames, y_train_filenames = get_train_test_lists(IMG_DIR, LABEL_DIR)
+    train_list, x_train_filenames, y_train_filenames = read_data.get_train_test_lists_icebridge(IMG_DIR, LABEL_DIR)
     with open(os.path.join(ROOT_DIR,datasets['train_filenames']), 'w') as f:
         for item in train_list:
             f.write("%s\n" % item)
