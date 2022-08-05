@@ -38,12 +38,25 @@ rio_session = rio.env.Env(aws_access_key_id=AWS_ACCESS_KEY_ID,
 
 
 def image_from_s3(bucket, key):
+    """Obtains an AWS S3 path for image files meeting a certain criteria and opens them with PIL.
+    Args:
+        bucket (string): The AWS bucket in which the image is stored.
+        key (string): The image path within the bucket
+    Returns:
+        Image.open(io.BytesIO(img_data)) (PIL Image): an Image opened with PIL.
+    """
     bucket = s3.Bucket(bucket)
     image = bucket.Object(key)
     img_data = image.get().get('Body').read()
     return Image.open(io.BytesIO(img_data)) 
 
 def image_from_s3_rio(url):
+    """Obtains an AWS S3 path for image files meeting a certain criteria and opens them with Rasterio.
+    Args:
+        url (string): The AWS S3 url for an image file.
+    Returns:
+        Image.fromarray(np.squeeze(np.array(dataset_array).astype(np.uint8))) (PIL Image): an Image opened with PIL.
+    """
     with rio_session:
         with rio.open(url) as dataset:
             dataset_array = dataset.read()
@@ -70,6 +83,7 @@ def iterate_bucket_items(bucket):
             for item in page['Contents']:
                 yield item
 
+# Get image paths in S3.
 items_s3 = []
 urls_s3 = []
 items_urls_s3 = []
@@ -85,6 +99,14 @@ for i in iterate_bucket_items(bucket='veda-ai-supraglacial-meltponds'):
 
 
 def downsample(image, image_name, option):
+    """Downsamples images using the downsample_factor parameter.
+    Args:
+        image (PIL image): An image opened in PIL.
+        image_name (string): The image filename.
+        option (string): Choice of r,g,b image or label image.
+    Returns:
+        n/a
+    """
     bucket = s3.Bucket('veda-ai-supraglacial-meltponds')
     filename_split = os.path.splitext(image_name) 
     filename_zero, fileext = filename_split 
@@ -116,8 +138,10 @@ def downsample(image, image_name, option):
             s3.Bucket('veda-ai-supraglacial-meltponds').put_object(Key=key, Body=in_mem_file)
         except IOError:
             print("cannot create thumbnail for '%s'" % i)
+    return
 
 
+# Downsample images
 
 for i_url in items_urls_s3:
     substring = "original"
@@ -138,6 +162,14 @@ for i_url in items_urls_s3:
 
 
 def tile(image, image_name, option):
+    """Tiles images using the tile_size parameter.
+    Args:
+        image (PIL image): An image opened in PIL.
+        image_name (string): The image filename.
+        option (string): Choice of r,g,b image or label image.
+    Returns:
+        n/a
+    """
     open_cv_image = np.array(image)
     image = np.array(image)
     print("downsampled image values pre tiling: ", np.unique(image))
@@ -191,6 +223,9 @@ def tile(image, image_name, option):
             else:
                 key = "tiled_labels/" + basename + "_" + str(nTileX) + "_" + str(nTileY) +".png"
             s3.Bucket('veda-ai-supraglacial-meltponds').put_object(Key=key, Body=in_mem_file)
+    return
+
+# Tile images
 
 items_s3 = []
 
