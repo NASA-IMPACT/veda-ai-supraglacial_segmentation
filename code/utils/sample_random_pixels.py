@@ -14,6 +14,22 @@ predpath = os.path.join(ROOT_DIR,datasets['icebridge_pred_dir/'])
 outpath = os.path.join(ROOT_DIR,datasets['icebridge_random_sample_dir'])
 
 
+def process_image(image_array, image_type, outpath):
+    """Takes an image array and writes it to a prescribed path.
+    Args:
+        image_array (nd.array): Image array.
+        image_type (string): The type of image, 'gt' for ground truth and 'pr' for prediction.
+        outpath (path): Directory to write masked tiles and sampled pixel coordinate lists to.
+    Returns:
+        n/a
+    """
+    img = Image.fromarray(image_array)
+    if (not os.path.isdir(outpath+str(image_type)+'/')):
+        os.mkdir(outpath+str(image_type)+'/')
+    img.save(outpath+str(image_type)+'/'+basename+'.png')
+    return
+    
+
 def random_sample(gtpath, predpath, outpath, number_tiles, number_pixels):
     """Randomly samples matching ground truth and prediction tiles along with pixels within tiles . 
     Masks all pixels not sampled as zero.
@@ -31,8 +47,6 @@ def random_sample(gtpath, predpath, outpath, number_tiles, number_pixels):
         filename_split = os.path.splitext(f)
         filename_zero, fileext = filename_split
         basename = os.path.basename(filename_zero)
-        basename1 = 'RDSISC4_'+basename
-        basename1 = basename1[:-4]+'_classified'+basename[-4:]
         im = cv2.imread(predpath+f)
         X,Y = np.where(im[...,0]>=0)
         coords = np.column_stack((X,Y))
@@ -40,37 +54,22 @@ def random_sample(gtpath, predpath, outpath, number_tiles, number_pixels):
         coordsn = coords[0:number_pixels]
         coords = coords[number_pixels:]
 
-        img = np.array(Image.open(gtpath+basename1+'.png'))
-
+        img = np.array(Image.open(gtpath+basename+'.png'))
         img1 = np.array(Image.open(predpath+basename+'.png'))
 
         img_gt = img.copy()
-
         img_ps = img1.copy()
 
         for i in coords:
             img_gt[i[1],i[0]] = 0
-
-        for i in coords:
             img_ps[i[1],i[0]] = 0
 
         with open(outpath+basename+'_coords_icebridge.txt', 'w') as file_handler:
             for item in coordsn:
                 file_handler.write("{}\n".format(item))
 
-        img_gt1 = Image.fromarray(img_gt)
-
-        img_ps1 = Image.fromarray(img_ps)
-
-        if (not os.path.isdir(outpath+'gt/')):
-            os.mkdir(outpath+'gt/')
-
-        if (not os.path.isdir(outpath+'pr/')):
-            os.mkdir(outpath+'gt/')
-
-        img_gt1.save(outpath+'gt/'+basename+'.png')
-
-        img_ps1.save(outpath+'pr/'+basename+'.png')
+        process_image(img_gt, 'gt', outpath)
+        process_image(img_ps, 'pr', outpath)
 
     df = pd.DataFrame(columns=['label_names', 'pred_names'])
     label_names = glob.glob(outpath+'gt/*')
