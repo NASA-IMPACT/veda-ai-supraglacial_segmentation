@@ -12,6 +12,11 @@ def get_class_counts_partitions(partition_list, c0,c1,c2,c3,c4,c5, num_classes):
     Returns:
         c0,c1,c2,c3,c4,c5 (int): The counts.
     """
+    def return_class_count(class_int,c):
+        if class_int in colors:
+            c+=color_count_dict[class_int]
+            return c
+
     for i in partition_list:
         img = np.array(Image.open(i))
         #print(img.shape)
@@ -19,25 +24,13 @@ def get_class_counts_partitions(partition_list, c0,c1,c2,c3,c4,c5, num_classes):
         #print(colors, counts)
         color_count_dict = dict(zip(colors, counts))
         print(color_count_dict)
-        if 0 in colors:
-            print("count for class 0: ", color_count_dict[0])
-            c0+=color_count_dict[0]
-        if 1 in colors:
-            print("count for class 1: ", color_count_dict[1])
-            c1+=color_count_dict[1]
-        if 2 in colors:
-            print("count for class 2: ", color_count_dict[2])
-            c2+=color_count_dict[2]
-        if 3 in colors:
-            print("count for class 3: ", color_count_dict[3])
-            c3+=color_count_dict[3]
-        if 4 in colors:
-            print("count for class 4: ", color_count_dict[4])
-            c4+=color_count_dict[4]
-        if 5 in colors:
-            print("count for class 5: ", color_count_dict[5])
-            c5+=color_count_dict[5]
-        return c0,c1,c2,c3,c4,c5
+        c0=return_class_count(0,c0)
+        c1=return_class_count(1,c1)
+        c2=return_class_count(2,c2)
+        c3=return_class_count(3,c3)
+        c4=return_class_count(4,c4)
+        c5=return_class_count(5,c5)
+    return c0,c1,c2,c3,c4,c5
 
 def get_class_pcts_partitions(partition_list, pcts_0,pcts_1,pcts_2,pcts_3,pcts_4,pcts_5):
     """Takes a list of filenames in a partition. Calculates the
@@ -49,29 +42,23 @@ def get_class_pcts_partitions(partition_list, pcts_0,pcts_1,pcts_2,pcts_3,pcts_4
     Returns:
         n/a
     """
+    def return_class_pct(class_int,pctl):
+        if class_int in colors:
+            pct = float(color_count_dict[class_int])/img.size
+            pctl.append((i, pct))
+            return pctl
+
     for i in partition_list:
         img = np.array(Image.open(i))
         colors, counts = np.unique(img, return_counts = True)
         color_count_dict = dict(zip(colors, counts))
         print(color_count_dict)
-        if 0 in colors:
-            pct_0 = float(color_count_dict[0])/img.size
-            pcts_0.append((i, color_count_dict[0]))
-        if 1 in colors:
-            pct_1 = float(color_count_dict[1])/img.size
-            pcts_1.append((i, color_count_dict[1]))
-        if 2 in colors:
-            pct_2 = float(color_count_dict[2])/img.size
-            pcts_2.append((i, color_count_dict[2]))
-        if 3 in colors:
-            pct_3 = float(color_count_dict[3])/img.size
-            pcts_3.append((i, color_count_dict[3]))
-        if 4 in colors:
-            pct_4 = float(color_count_dict[4])/img.size
-            pcts_4.append((i, color_count_dict[4]))
-        if 5 in colors:
-            pct_5 = float(color_count_dict[5])/img.size
-            pcts_5.append((i, color_count_dict[5]))
+        pcts_0=return_class_pct(0,pcts_0)
+        pcts_1=return_class_pct(1,pcts_1)
+        pcts_2=return_class_pct(2,pcts_2)
+        pcts_3=return_class_pct(3,pcts_3)
+        pcts_4=return_class_pct(4,pcts_4)
+        pcts_5=return_class_pct(5,pcts_5)
     return
 
 def get_class_rgb_ranges_partitions(partition_list_x, partition_list_y, r0,r1,r2,r3,r4,r5, g0,g1,g2,g3,g4,g5, b0,b1,b2,b3,b4,b5):
@@ -92,59 +79,21 @@ def get_class_rgb_ranges_partitions(partition_list_x, partition_list_y, r0,r1,r2
         #print(colors, counts)
         color_count_dict = dict(zip(colors, counts))
         print(color_count_dict)
-        if 0 in colors:
-            coords = np.column_stack(np.where(img == 0))
-            print("coords for 0: ", coords)
-            for coord in coords:
-                x,y = coord
-                print("rgb values for class 0: ", rgb[x,y])
-                r0v, g0v, b0v = rgb[x,y]
-                r0.append(r0v)
-                g0.append(g0v)
-                b0.append(b0v)
-        if 1 in colors:
-            coords = np.column_stack(np.where(img == 1))
-            for coord in coords:
-                x,y = coord
-                r1v, g1v, b1v = rgb[x,y]
-                print("rgb values for class 1: ", rgb[x,y])
-                r1.append(r1v)
-                g1.append(g1v)
-                b1.append(b1v)
-        if 2 in colors:
-            coords = np.column_stack(np.where(img == 2))
-            for coord in coords:
-                x,y = coord
-                r2v, g2v, b2v = rgb[x,y]
-                print("rgb values for class 2: ", rgb[x,y])
-                r2.append(r2v)
-                g2.append(g2v)
-                b2.append(b2v)
-        if 3 in colors:
-            coords = np.column_stack(np.where(img == 3))
-            for coord in coords:
-                x,y = coord
-                r3v, g3v, b3v = rgb[x,y]
-                print("rgb values for class 3: ", rgb[x,y])
-                r3.append(r3v)
-                g3.append(g3v)
-                b3.append(b3v)
-        if 4 in colors:
-            coords = np.column_stack(np.where(img == 4))
-            for coord in coords:
-                x,y = coord
-                r4v, g4v, b4v = rgb[x,y]
-                print("rgb values for class 4: ", rgb[x,y])
-                r4.append(r4v)
-                g4.append(g4v)
-                b4.append(b4v)
-        if 5 in colors:
-            coords = np.column_stack(np.where(img == 5))
-            for coord in coords:
-                x,y = coord
-                r5v, g5v, b5v = rgb[x,y]
-                print("rgb values for class 5: ", rgb[x,y])
-                r5.append(r5v)
-                g5.append(g5v)
-                b5.append(b5v)
+        def return_rgb_values(r,g,b,img, class_int):
+            if class_int in colors:
+                coords = np.column_stack(np.where(img == class_int))
+                for coord in coords:
+                    x,y = coord
+                    rv, gv, bv = rgb[x,y]
+                    r.append(rv)
+                    g.append(gv)
+                    b.append(bv)
+            return
+
+        return_rgb_values(r0,g0,b0,img, 0)
+        return_rgb_values(r1,g1,b1,img, 1)
+        return_rgb_values(r2,g2,b2,img, 2)
+        return_rgb_values(r3,g3,b3,img, 3)
+        return_rgb_values(r4,g4,b4,img, 4)
+        return_rgb_values(r5,g5,b5,img, 5)
         return 
