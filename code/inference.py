@@ -144,7 +144,7 @@ else:
 
 
 def get_predictions(image= None, dataset=None, num=1):
-    if image is None and dataset is None:
+    if not(image) and not(dataset):
         return ValueError("At least one of image or dataset must not be None.")
     if dataset:
         for image, mask in dataset.take(num):

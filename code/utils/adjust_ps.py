@@ -61,3 +61,4 @@ def adjust_planet_image(image):
 
 for i in x_test_filenames:
     adjust_planet_image(i)
+

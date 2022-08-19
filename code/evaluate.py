@@ -1,21 +1,18 @@
-import os, fnmatch, functools, glob
-from itertools import product
-from zipfile import ZipFile
-
+import fnmatch, functools, glob
+import geopandas as gpd
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.image as mpimg
 import numpy as np
-
+import os
 import pandas as pd
+from itertools import product
 from PIL import Image
-import geopandas as gpd
-from IPython.display import clear_output
-from time import sleep
-from utils.read_data import get_image_label_arrays
-
 import skimage.io as skio # lighter dependency than tensorflow for working with our tensors/arrays
 from sklearn.metrics import confusion_matrix, f1_score
+from utils.read_data import get_image_label_arrays
+from zipfile import ZipFile
+
 
 with open("../configs/datasets.json", "r") as f:
     datasets = json.load(f)
