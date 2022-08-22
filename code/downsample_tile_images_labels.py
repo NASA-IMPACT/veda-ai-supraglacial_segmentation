@@ -8,6 +8,7 @@ import cv2
 import math
 import rasterio as rio
 import skimage.transform
+from utils import s3_utils
 
 # This script requires access to a file containing your aws credentials formatted as such:
 """
@@ -37,58 +38,12 @@ rio_session = rio.env.Env(aws_access_key_id=AWS_ACCESS_KEY_ID,
              region_name='us-east')
 
 
-def image_from_s3(bucket, key):
-    """Obtains an AWS S3 path for image files meeting a certain criteria and opens them with PIL.
-    Args:
-        bucket (string): The AWS bucket in which the image is stored.
-        key (string): The image path within the bucket
-    Returns:
-        Image.open(io.BytesIO(img_data)) (PIL Image): an Image opened with PIL.
-    """
-    bucket = s3.Bucket(bucket)
-    image = bucket.Object(key)
-    img_data = image.get().get('Body').read()
-    return Image.open(io.BytesIO(img_data)) 
-
-def image_from_s3_rio(url):
-    """Obtains an AWS S3 path for image files meeting a certain criteria and opens them with Rasterio.
-    Args:
-        url (string): The AWS S3 url for an image file.
-    Returns:
-        Image.fromarray(np.squeeze(np.array(dataset_array).astype(np.uint8))) (PIL Image): an Image opened with PIL.
-    """
-    with rio_session:
-        with rio.open(url) as dataset:
-            dataset_array = dataset.read()
-            dataset_array = dataset_array.transpose(1,2,0)
-    return Image.fromarray(np.squeeze(np.array(dataset_array).astype(np.uint8)))
-
-def iterate_bucket_items(bucket):
-    """
-    Generator that iterates over all objects in a given s3 bucket
-
-    See http://boto3.readthedocs.io/en/latest/reference/services/s3.html#S3.Client.list_objects_v2 
-    for return data format
-    :param bucket: name of s3 bucket
-    :return: dict of metadata for an object
-    """
-
-
-    client = client = boto3.client('s3',aws_access_key_id=AWS_ACCESS_KEY_ID,aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
-    paginator = client.get_paginator('list_objects_v2')
-    page_iterator = paginator.paginate(Bucket = bucket)
-
-    for page in page_iterator:
-        if page['KeyCount'] > 0:
-            for item in page['Contents']:
-                yield item
-
 # Get image paths in S3.
 items_s3 = []
 urls_s3 = []
 items_urls_s3 = []
 
-for i in iterate_bucket_items(bucket='veda-ai-supraglacial-meltponds'):
+for i in s3_utils.iterate_bucket_items(bucket='veda-ai-supraglacial-meltponds'):
     bucket='veda-ai-supraglacial-meltponds'
     ik = i["Key"]
     items_s3.append(ik)
@@ -154,9 +109,9 @@ for i_url in items_urls_s3:
         i = i_url[0]
         url = i_url[1]
         if option == "image":
-            image_in_mem = image_from_s3("veda-ai-supraglacial-meltponds", str(i))
+            image_in_mem = s3_utils.image_from_s3("veda-ai-supraglacial-meltponds", str(i))
         else:
-            image_in_mem = image_from_s3_rio(url)
+            image_in_mem = s3_utils.image_from_s3_rio(url)
             #option = "label"
         downsample(image_in_mem, i, option)
 
@@ -182,7 +137,7 @@ def tile(image, image_name, option):
     n_tiles_x = math.ceil(image.shape[1]/tile_size)
     n_tiles_y = math.ceil(image.shape[0]/tile_size)
 
-    makeLastPartFull = True; 
+    make_last_part_full = True; 
 
     for n_tile_x in range(n_tiles_x):
         for n_tile_y in range(n_tiles_y):
@@ -192,13 +147,13 @@ def tile(image, image_name, option):
             start_y = n_tile_y*tile_size
             end_y = start_y + tile_size;
 
-            if(endY > image.shape[0]):
+            if(end_y > image.shape[0]):
                 end_y = image.shape[0]
 
-            if(endX > image.shape[1]):
+            if(end_x > image.shape[1]):
                 end_x = image.shape[1]
 
-            if( makeLastPartFull == True and (n_tile_x == n_tiles_x-1 or n_tile_y == n_tiles_y-1) ):
+            if( make_last_part_full == True and (n_tile_x == n_tiles_x-1 or n_tile_y == n_tiles_y-1) ):
                 start_x = end_x - tile_size
                 start_y = end_y - tile_size
 
@@ -234,7 +189,7 @@ for i in iterate_bucket_items(bucket='veda-ai-supraglacial-meltponds'):
 for i in items_s3:
     # Option can be "image" or "label"
     if option == "image":
-        substring = substring = f"downsampled_{option}s"
+        substring = f"downsampled_{option}s"
     else:
         substring = f"downsampled_{option}s"
     substring1 = "png"
