@@ -24,6 +24,7 @@ with open(configFilePath) as f:
     config.read_file(f)
 AWS_ACCESS_KEY_ID = config.get('credentials', 'AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = config.get('credentials', 'AWS_SECRET_ACCESS_KEY')
+BUCKET = "veda-ai-supraglacial-meltponds"
 
 downsample_factor = 20.0
 tile_size = 224
@@ -43,8 +44,7 @@ items_s3 = []
 urls_s3 = []
 items_urls_s3 = []
 
-for item in s3_utils.iterate_bucket_items(bucket='veda-ai-supraglacial-meltponds'):
-    bucket = "veda-ai-supraglacial-meltponds"
+for item in s3_utils.iterate_bucket_items(bucket=BUCKET):
     ik = item["Key"]
     items_s3.append(ik)
     url = f"s3://{str(bucket)}/{str(ik)}"
@@ -62,7 +62,7 @@ def downsample(image, image_name, option):
     Returns:
         n/a
     """
-    bucket = s3.Bucket('veda-ai-supraglacial-meltponds')
+    bucket = s3.Bucket(BUCKET)
     filename_split = os.path.splitext(image_name) 
     filename_zero, fileext = filename_split 
     basename = os.path.basename(filename_zero) 
@@ -90,7 +90,7 @@ def downsample(image, image_name, option):
             key = outfile
 
             # Upload image to s3
-            s3.Bucket('veda-ai-supraglacial-meltponds').put_object(Key=key, Body=in_mem_file)
+            s3.Bucket(BUCKET).put_object(Key=key, Body=in_mem_file)
         except IOError:
             print("cannot create thumbnail for '%s'" % i)
     return
@@ -109,7 +109,7 @@ for i_url in items_urls_s3:
         item = i_url[0]
         url = i_url[1]
         if option == "image":
-            image_in_mem = s3_utils.image_from_s3("veda-ai-supraglacial-meltponds", str(i))
+            image_in_mem = s3_utils.image_from_s3(BUCKET, str(i))
         else:
             image_in_mem = s3_utils.image_from_s3_rio(url)
             #option = "label"
@@ -175,14 +175,14 @@ def tile(image, image_name, option):
                 key = f"tiled_images/{basename}_{str(n_tile_x)}_({str(n_tile_y)}).png"
             else:
                 key = f"tiled_labels/{basename}/{str(n_tile_x)}_{str(n_tile_y)}.png"
-            s3.Bucket('veda-ai-supraglacial-meltponds').put_object(Key=key, Body=in_mem_file)
+            s3.Bucket(BUCKET).put_object(Key=key, Body=in_mem_file)
     return
 
 # Tile images
 
 items_s3 = []
 
-for item in iterate_bucket_items(bucket="veda-ai-supraglacial-meltponds"):
+for item in iterate_bucket_items(bucket=BUCKET):
     ik = item["Key"]
     items_s3.append(ik)
 
@@ -195,7 +195,7 @@ for item in items_s3:
     substring1 = "png"
     if substring in str(item) and substring1 in str(item): 
         print(item)
-        image_in_mem = image_from_s3("veda-ai-supraglacial-meltponds", str(item))
+        image_in_mem = image_from_s3(BUCKET, str(item))
         tile(image_in_mem, item, option)
     else:
         continue
