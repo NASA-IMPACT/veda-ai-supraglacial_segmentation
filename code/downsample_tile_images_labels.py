@@ -92,7 +92,7 @@ for i in iterate_bucket_items(bucket='veda-ai-supraglacial-meltponds'):
     bucket='veda-ai-supraglacial-meltponds'
     ik = i["Key"]
     items_s3.append(ik)
-    url = 's3://'+str(bucket)+'/'+str(ik)
+    url = f"s3://{str(bucket)}/{str(ik)}"
     urls_s3.append(url)
     item_url = (ik, url)
     items_urls_s3.append(item_url)
@@ -112,9 +112,9 @@ def downsample(image, image_name, option):
     filename_zero, fileext = filename_split 
     basename = os.path.basename(filename_zero) 
     if option == "image":
-        outfile = "downsampled_images/"+basename+".png"
+        outfile = f"downsampled_images/{basename}.png"
     else:
-        outfile = "downsampled_labels/"+basename+".png"
+        outfile = f"downsampled_labels/{basename}.png"
     if i != outfile:
         try:
 
@@ -144,6 +144,7 @@ def downsample(image, image_name, option):
 # Downsample images
 
 for i_url in items_urls_s3:
+    # Option can be "image" or "label"
     substring = "original"
     if option == "image":
         substring1 = ".JPG" 
@@ -154,10 +155,9 @@ for i_url in items_urls_s3:
         url = i_url[1]
         if option == "image":
             image_in_mem = image_from_s3("veda-ai-supraglacial-meltponds", str(i))
-            option = "image"
         else:
             image_in_mem = image_from_s3_rio(url)
-            option = "label"
+            #option = "label"
         downsample(image_in_mem, i, option)
 
 
@@ -179,49 +179,47 @@ def tile(image, image_name, option):
     else:
         continue
 
-    tileSizeX = 224;
-    tileSizeY = 224;
-    numTilesX = math.ceil(image.shape[1]/tileSizeX)
-    numTilesY = math.ceil(image.shape[0]/tileSizeY)
+    n_tiles_x = math.ceil(image.shape[1]/tile_size)
+    n_tiles_y = math.ceil(image.shape[0]/tile_size)
 
     makeLastPartFull = True; 
 
-    for nTileX in range(numTilesX):
-        for nTileY in range(numTilesY):
-            print("nTileX, nTileY: ", nTileX, nTileY)
-            startX = nTileX*tileSizeX
-            endX = startX + tileSizeX
-            startY = nTileY*tileSizeY
-            endY = startY + tileSizeY;
+    for n_tile_x in range(n_tiles_x):
+        for n_tile_y in range(n_tiles_y):
+            print("n_tile_x, n_tiles_y: ", n_tile_x, n_tiles_y)
+            start_x = n_tile_x*tile_size
+            end_x = start_x + tile_size
+            start_y = n_tile_y*tile_size
+            end_y = start_y + tile_size;
 
             if(endY > image.shape[0]):
-                endY = image.shape[0]
+                end_y = image.shape[0]
 
             if(endX > image.shape[1]):
-                endX = image.shape[1]
+                end_x = image.shape[1]
 
-            if( makeLastPartFull == True and (nTileX == numTilesX-1 or nTileY == numTilesY-1) ):
-                startX = endX - tileSizeX
-                startY = endY - tileSizeY
+            if( makeLastPartFull == True and (n_tile_x == n_tiles_x-1 or n_tile_y == n_tiles_y-1) ):
+                start_x = end_x - tile_size
+                start_y = end_y - tile_size
 
-            currentTile = image[startY:endY, startX:endX]
+            current_tile = image[start_y:end_y, start_x:end_x]
             if option == "image":
-                currentTile = cv2.cvtColor(currentTile, cv2.COLOR_BGR2RGB)
+                current_tile = cv2.cvtColor(current_tile, cv2.COLOR_BGR2RGB)
             else:
                 continue
-            print("currentTile shape: ", currentTile.shape)
+            print("current_tile shape: ", current_tile.shape)
             in_mem_file = io.BytesIO()
-            print("output values in tile: ", np.unique(currentTile))
-            currentTile_pil = Image.fromarray(currentTile)
-            currentTile_pil.save(in_mem_file, format="PNG")
+            print("output values in tile: ", np.unique(current_tile))
+            current_tile_pil = Image.fromarray(current_tile)
+            current_tile_pil.save(in_mem_file, format="PNG")
             in_mem_file.seek(0)
             filename_split = os.path.splitext(image_name) 
             filename_zero, fileext = filename_split 
             basename = os.path.basename(filename_zero) 
             if option == "image":
-                key = "tiled_images/" + basename + "_" + str(nTileX) + "_" + str(nTileY) +".png"
+                key = f"tiled_images/{basename}_{str(n_tile_x)}_({str(n_tile_y)}).png"
             else:
-                key = "tiled_labels/" + basename + "_" + str(nTileX) + "_" + str(nTileY) +".png"
+                key = f"tiled_labels/{basename}/{str(n_tile_x)}_{str(n_tile_y)}.png"
             s3.Bucket('veda-ai-supraglacial-meltponds').put_object(Key=key, Body=in_mem_file)
     return
 
@@ -234,12 +232,11 @@ for i in iterate_bucket_items(bucket='veda-ai-supraglacial-meltponds'):
     items_s3.append(ik)
 
 for i in items_s3:
+    # Option can be "image" or "label"
     if option == "image":
-        substring = "downsampled_images"
-        option = "image"
+        substring = substring = f"downsampled_{option}s"
     else:
-        substring = "downsampled_labels"
-        option = "label"
+        substring = f"downsampled_{option}s"
     substring1 = "png"
     if substring in str(i) and substring1 in str(i): 
         print(i)
