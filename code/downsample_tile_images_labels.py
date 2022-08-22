@@ -43,9 +43,9 @@ items_s3 = []
 urls_s3 = []
 items_urls_s3 = []
 
-for i in s3_utils.iterate_bucket_items(bucket='veda-ai-supraglacial-meltponds'):
-    bucket='veda-ai-supraglacial-meltponds'
-    ik = i["Key"]
+for item in s3_utils.iterate_bucket_items(bucket='veda-ai-supraglacial-meltponds'):
+    bucket = "veda-ai-supraglacial-meltponds"
+    ik = item["Key"]
     items_s3.append(ik)
     url = f"s3://{str(bucket)}/{str(ik)}"
     urls_s3.append(url)
@@ -106,14 +106,14 @@ for i_url in items_urls_s3:
     else:
         substring1 = "_classified.tif"
     if substring in str(i_url) and substring1 in str(i_url):
-        i = i_url[0]
+        item = i_url[0]
         url = i_url[1]
         if option == "image":
             image_in_mem = s3_utils.image_from_s3("veda-ai-supraglacial-meltponds", str(i))
         else:
             image_in_mem = s3_utils.image_from_s3_rio(url)
             #option = "label"
-        downsample(image_in_mem, i, option)
+        downsample(image_in_mem, item, option)
 
 
 def tile(image, image_name, option):
@@ -182,21 +182,21 @@ def tile(image, image_name, option):
 
 items_s3 = []
 
-for i in iterate_bucket_items(bucket='veda-ai-supraglacial-meltponds'):
-    ik = i["Key"]
+for item in iterate_bucket_items(bucket="veda-ai-supraglacial-meltponds"):
+    ik = item["Key"]
     items_s3.append(ik)
 
-for i in items_s3:
+for item in items_s3:
     # Option can be "image" or "label"
     if option == "image":
         substring = f"downsampled_{option}s"
     else:
         substring = f"downsampled_{option}s"
     substring1 = "png"
-    if substring in str(i) and substring1 in str(i): 
-        print(i)
-        image_in_mem = image_from_s3("veda-ai-supraglacial-meltponds", str(i))
-        tile(image_in_mem, i, option)
+    if substring in str(item) and substring1 in str(item): 
+        print(item)
+        image_in_mem = image_from_s3("veda-ai-supraglacial-meltponds", str(item))
+        tile(image_in_mem, item, option)
     else:
         continue
 
