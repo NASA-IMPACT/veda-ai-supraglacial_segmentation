@@ -1,13 +1,15 @@
-import os, sys, glob
 import boto3
-from PIL import Image
-import io
-from configparser import ConfigParser
-import numpy as np
 import cv2
+import glob
+import io
 import math
+import numpy as np
+import os
 import rasterio as rio
 import skimage.transform
+import sys
+from configparser import ConfigParser
+from PIL import Image
 from utils import s3_utils
 
 # This script requires access to a file containing your aws credentials formatted as such:
