@@ -26,7 +26,15 @@ pred_arr_lst = path_df["pred_names"].apply(skio.imread)
 pred_arr_lst_valid, label_arr_lst_valid = get_image_label_arrays(path_df)
 
 # Compute per class IoU        
-def maskIOU(mask1, mask2, class_val):   # From the question.
+def maskIOU(mask1, mask2, class_val):  
+    """Computes a per-class Intersection over Union (IoU) score between two arrays.
+    Args:
+        mask1 (nd.array): The ground truth array.
+        mask1 (nd.array): The prediction array.
+        class_val (int): The class value to compute an IoU score for.
+    Returns:
+        iou (float): The IoU score for the specified class.
+    """
     mask1_area = np.count_nonzero(mask1 == int(class_val))
     mask2_area = np.count_nonzero(mask2 == int(class_val))
     intersection = np.count_nonzero(np.logical_and( mask1==int(class_val),  mask2==int(class_val) ))

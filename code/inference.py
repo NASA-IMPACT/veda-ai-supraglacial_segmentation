@@ -144,6 +144,14 @@ else:
 
 
 def get_predictions(image= None, dataset=None, num=1):
+    """
+    Args:
+        image (nd.array): An input true color image.
+        dataset (tf.dataset): A tf.dataset containing true color images.
+        num (int): The number of images to take from the batch.
+    Returns:
+        pred_mask (nd.array): An array containing the image prediction.
+    """
     if not(image) and not(dataset):
         return ValueError("At least one of image or dataset must not be None.")
     if dataset:
