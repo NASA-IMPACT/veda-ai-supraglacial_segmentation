@@ -5,18 +5,35 @@ import numpy as np
 #NDWI_THRESH = 0.3
 #NIR_THRESH = 3000
 
-def mask(img_thresh, img_pred, thresh):
-    img_pred[np.where((img_pred == 3) & (img_thresh >= thresh))] = 0
-    img_pred[np.where((img_pred == 4) & (img_thresh >= thresh))] = 0
+def mask(image_arr, img_pred, thresh):
+    """Function to mask the prediction using a dynamically thresholded information channel.
+    Args:
+        image_arr (nd.array): The information channel array.
+        img_pred (nd.array): The prediction array.
+        thresh (float): The threshold value to apply to the information channel.
+    Returns:
+        img_pred (nd.array): The masked prediction array, where values not exceeding the thresholded 
+        information channel are set to zero.
+    """
+    img_pred[np.where((img_pred == 3) & (image_arr >= thresh))] = 0
+    img_pred[np.where((img_pred == 4) & (image_arr >= thresh))] = 0
     return img_pred
 
 def process(image_arr, img_pred):
+    """Function to dynamically threshold the information channel (options being ['nir', 'ndwi', 'blue']).
+    Args:
+        image_arr (nd.array): The information channel array.
+        img_pred (nd.array): The prediction array.
+    Returns:
+        img_pred (nd.array): The masked prediction array, where values not exceeding the thresholded 
+        information channel are set to zero.
+    """
     thresh = image_arr.max() * 0.1 
     if thresh  < image_arr.min():
         range = image_arr.max() - image_arr.min()
         thresh = image_arr.max() - (0.9 * range) 
     image_arr = np.expand_dims(image_arr, axis=2)
-    img_pred = mask(b, img_pred, thresh)
+    img_pred = mask(image_arr, img_pred, thresh)
     return img_pred
 
 
