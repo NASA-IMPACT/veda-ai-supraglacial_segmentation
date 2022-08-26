@@ -60,9 +60,9 @@ def random_sample(gtpath, predpath, outpath, number_tiles, number_pixels):
         img_gt = img.copy()
         img_ps = img1.copy()
 
-        for i in coords:
-            img_gt[i[1],i[0]] = 0
-            img_ps[i[1],i[0]] = 0
+        for coord in coords:
+            img_gt[coord[1],coord[0]] = 0
+            img_ps[coord[1],coord[0]] = 0
 
         with open(outpath+basename+'_coords_icebridge.txt', 'w') as file_handler:
             for item in coordsn:
