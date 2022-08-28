@@ -18,7 +18,7 @@ def get_test_lists_planetscope(imdir):
     for img_id in dset_list:
         x_filenames.append(os.path.join(imdir, "{}.png".format(img_id)))
 
-    print("number of images: ", len(dset_list))
+    #print("number of images: ", len(dset_list))
     return x_filenames
 
 def get_train_test_lists_icebridge(imdir, lbldir):
@@ -35,7 +35,7 @@ def get_train_test_lists_icebridge(imdir, lbldir):
         x_filenames.append(os.path.join(imdir, "{}.png".format(img_id)))
         y_filenames.append(os.path.join(lbldir, "RDSISC4_{}_classified{}.png".format(img_id[:-4], img_id[-4:])))
 
-    print("number of images: ", len(dset_list))
+    #print("number of images: ", len(dset_list))
     return dset_list, x_filenames, y_filenames
 
 def get_image_label_arrays(path_df):
@@ -49,10 +49,10 @@ def get_image_label_arrays(path_df):
         if pred_arr_lst[i].shape != label_arr_lst[i].shape:
             
             print(f"The {i}th label has an incorrect dimension, skipping.")
-            print(pred_arr_lst[i])
-            print(label_arr_lst[i])
-            print(pred_arr_lst[i].shape)
-            print(label_arr_lst[i].shape)
+            #print(pred_arr_lst[i])
+            #print(label_arr_lst[i])
+            #print(pred_arr_lst[i].shape)
+            #print(label_arr_lst[i].shape)
             
         else:
             pred_arr_lst_valid.append(pred_arr_lst[i])
@@ -91,7 +91,7 @@ def read_background(train_list, ROOT_DIR, LABEL_DIR, skip, proportion_remove):
             if img.max()==0:
                 background_list_train.append(i)
 
-        print("Number of background images: ", len(background_list_train))
+        #print("Number of background images: ", len(background_list_train))
 
         with open(os.path.join(ROOT_DIR,datasets['background_files']), 'w') as f:
             for item in background_list_train:
@@ -99,7 +99,7 @@ def read_background(train_list, ROOT_DIR, LABEL_DIR, skip, proportion_remove):
 
     else:
         background_list_train = [line.strip() for line in open(os.path.join(ROOT_DIR,datasets['background_files']), 'r')]
-        print("Number of background images: ", len(background_list_train))
+        #print("Number of background images: ", len(background_list_train))
     background_removal = len(background_list_train) * float(proportion_remove)
     train_list_clean = [y for y in train_list if y not in background_list_train[0:int(background_removal)]]
     return background_removal, train_list_clean
@@ -111,8 +111,8 @@ def get_lists_partitions(train_list_clean, x_train_filenames, y_train_filenames,
         x_train_filenames.append(os.path.join(IMG_DIR, "{}.png".format(img_id)))
         y_train_filenames.append(os.path.join(LABEL_DIR, "RDSISC4_{}_classified{}.png".format(img_id[:-4], img_id[-4:])))
 
-    print("Number of background tiles: ", background_removal)
-    print("Remaining number of tiles after 90% background removal: ", len(train_list_clean))
+    #print("Number of background tiles: ", background_removal)
+    #print("Remaining number of tiles after 90% background removal: ", len(train_list_clean))
 
     x_train_filenames_partition_fn = os.path.join(ROOT_DIR,datasets['x_train_filenames_partition'])
     y_train_filenames_partition_fn = os.path.join(ROOT_DIR,datasets['y_train_filenames_partition'])
@@ -136,9 +136,9 @@ def get_lists_partitions(train_list_clean, x_train_filenames, y_train_filenames,
 
 def check_write_lists_partitions(vals_train, vals_val, vals_test, train_list_clean, x_train_filenames, y_train_filenames):
     if set([0, 1, 2, 3, 4, 5]).issubset(set(flatten(vals_train))) == True and set([0, 1, 2, 3, 4, 5]).issubset(set(flatten(vals_val))) == True and set([0, 1, 2, 3, 4, 5]).issubset(set(flatten(vals_test))) == True:
-        print("each partition has all values")
+        #print("each partition has all values")
     else:
-        print("re-partitioning")
+        #print("re-partitioning")
         x_train_filenames = []
         y_train_filenames = []
 
@@ -152,9 +152,9 @@ def check_write_lists_partitions(vals_train, vals_val, vals_test, train_list_cle
         get_vals_in_partition(vals_train, x_train_filenames, y_train_filenames)
         get_vals_in_partition(vals_val, x_val_filenames, y_val_filenames)
         get_vals_in_partition(vals_test, x_test_filenames, y_test_filenames)
-        print("Values in training partition: ", set(flatten(vals_train)))
-        print("Values in validation partition: ", set(flatten(vals_val)))
-        print("Values in test partition: ", set(flatten(vals_test)))
+        #print("Values in training partition: ", set(flatten(vals_train)))
+        #print("Values in validation partition: ", set(flatten(vals_val)))
+        #print("Values in test partition: ", set(flatten(vals_test)))
 
     if not os.path.isfile(fn) for fn in [x_train_filenames_partition_fn, y_train_filenames_partition, x_val_filenames_partition, y_val_filenames_partition, x_test_filenames_partition, y_test_filenames_partition]:
         with open(os.path.join(ROOT_DIR,datasets['x_train_filenames_partition']), 'w') as f:

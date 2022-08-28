@@ -74,7 +74,7 @@ if os.path.isfile(fn) for fn in [x_test_filenames_partition_fn, y_test_filenames
 else:
     test_list, x_test_filenames, y_test_filenames = data_utils.get_test_lists_planetscope(IMG_DIR, LABEL_DIR)
 
-print("!!!!! number of images: ", len(x_test_filenames))
+print("Number of images que'ed for inference: ", len(x_test_filenames))
 
 # dataset configuration for testing
 test_cfg = {
@@ -109,7 +109,7 @@ for x,y in zip(x_test_filenames, y_test_filenames):
         continue
 
 num_foreground_examples = len(foreground_list_y)
-print("num_foreground_examples: ", num_foreground_examples)
+#print("num_foreground_examples: ", num_foreground_examples)
 
 display_num = 1
 r_choices = np.random.choice(num_foreground_examples, 1) #num_foreground_examples, 1)
@@ -194,8 +194,8 @@ for i in range(0, len(x_test_filenames)):
     image, mask = batch_of_imgs[0], label[0,:,:,:]
     mask_int = tf.dtypes.cast(mask, tf.int32)
     true_masks.append(mask_int)
-    print(y_test_filenames[img_num:img_num+1])
-    print(np.unique(mask_int))
+    #print(y_test_filenames[img_num:img_num+1])
+    #print(np.unique(mask_int))
 
     # run and plot predictions
     pred_mask = get_predictions(image)

@@ -80,7 +80,7 @@ except:
             f.write("%s\n" % item)
 
 
-print("number of images: ", len(train_list))
+print("Number of images available for training: ", len(train_list))
 
 skip = False
 proportion_remove = 0.9
@@ -350,7 +350,7 @@ loss = model_history.history['loss']
 val_loss = model_history.history['val_loss']
 
 final_epochs = len(model_history.history['loss'])
-print("final number of epochs: ", final_epochs)
+print("Final number of epochs: ", final_epochs)
 
 if (not os.path.isdir(OUTPUT_DIR)):
     os.mkdir(OUTPUT_DIR)
