@@ -10,8 +10,9 @@ from itertools import product
 from PIL import Image
 import skimage.io as skio # lighter dependency than tensorflow for working with our tensors/arrays
 from sklearn.metrics import confusion_matrix, f1_score
-from utils.read_data import get_image_label_arrays
 from zipfile import ZipFile
+
+from utils.read_data import get_image_label_arrays
 
 
 with open("../configs/datasets.json", "r") as f:

@@ -1,31 +1,37 @@
-import datetime, os, fnmatch, functools, io, glob, random, shutil, json
-from itertools import product
-from time import sleep
-from zipfile import ZipFile
-
-from focal_loss import SparseCategoricalFocalLoss
+import datetime
+import fnmatch
+import functools
 import geopandas as gpd
-import numpy as np
-import pandas as pd
-from PIL import Image
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, f1_score
-import skimage.io as skio
+import glob
+import io
+import json
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-
-from rasterio import features, mask
-
-from segmentation_models.metrics import iou_score
+import numpy as np
+import os
+import pandas as pd
+import random
+import shutil
+import skimage.io as skio
 import tensorflow as tf
 import tensorflow_addons as tfa
 import tensorflow_datasets as tfds
+
+from focal_loss import SparseCategoricalFocalLoss
+from itertools import product
+from PIL import Image
+from rasterio import features, mask
+from segmentation_models.metrics import iou_score
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix, f1_score
 from tensorflow_examples.models.pix2pix import pix2pix
-from tensorflow.python.keras import layers, losses, models
 from tensorflow.python.keras import backend as K  
+from tensorflow.python.keras import layers, losses, models
 from tf_explain.callbacks.activations_visualization import ActivationsVisualizationCallback
+from time import sleep
 from tqdm.notebook import tqdm
+from zipfile import ZipFile
 
 from utils import model_utils, data_utils
 

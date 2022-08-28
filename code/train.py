@@ -1,21 +1,27 @@
-import datetime, os, fnmatch, functools, io, glob, random, shutil, json
-from itertools import product
-from time import sleep
-from zipfile import ZipFile
-
+import datetime
+import fnmatch
+import functools
 import geopandas as gpd
-import numpy as np
-import pandas as pd
-from PIL import Image
-import skimage.io as skio
+import glob
+import io
+import json
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-
-from rasterio import features, mask
+import numpy as np
+import os 
+import pandas as pd
+import random
+import shutil
+import skimage.io as skio
 import tensorflow as tf
-from focal_loss import SparseCategoricalFocalLoss
 
+from focal_loss import SparseCategoricalFocalLoss
+from itertools import product
+from PIL import Image
+from rasterio import features, mask
+from time import sleep
+from zipfile import ZipFile
 #from tqdm.notebook import tqdm
 
 from utils import model_utils, data_utils

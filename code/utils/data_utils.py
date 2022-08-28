@@ -1,9 +1,10 @@
-import os, glob
-import numpy as np
-import skimage.io as skio
+import glob
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import numpy as np
+import os
+import skimage.io as skio
 
 def get_test_lists_planetscope(imdir):
     imgs = glob.glob(os.path.join(imdir,"*.png"))
