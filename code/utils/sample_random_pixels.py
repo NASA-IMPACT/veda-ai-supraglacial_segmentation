@@ -24,9 +24,9 @@ def process_image(image_array, image_type, outpath):
         n/a
     """
     img = Image.fromarray(image_array)
-    if (not os.path.isdir(outpath+str(image_type)+'/')):
-        os.mkdir(outpath+str(image_type)+'/')
-    img.save(outpath+str(image_type)+'/'+basename+'.png')
+    if (not os.path.isdir(f"{outpath}/{str(image_type)}/")):
+        os.mkdir(f"{outpath}/{str(image_type)}/")
+    img.save(f"{outpath}/{str(image_type)}/{basename}.png")
     return
     
 
@@ -54,8 +54,8 @@ def random_sample(gtpath, predpath, outpath, number_tiles, number_pixels):
         coordsn = coords[0:number_pixels]
         coords = coords[number_pixels:]
 
-        img = np.array(Image.open(gtpath+basename+'.png'))
-        img1 = np.array(Image.open(predpath+basename+'.png'))
+        img = np.array(Image.open(f"{gtpath}/{basename}.png"))
+        img1 = np.array(Image.open(f"{predpath}/{basename}.png"))
 
         img_gt = img.copy()
         img_ps = img1.copy()
@@ -64,7 +64,7 @@ def random_sample(gtpath, predpath, outpath, number_tiles, number_pixels):
             img_gt[i[1],i[0]] = 0
             img_ps[i[1],i[0]] = 0
 
-        with open(outpath+basename+'_coords_icebridge.txt', 'w') as file_handler:
+        with open(f"{outpath}/{basename}_coords_icebridge.txt", 'w') as file_handler:
             for item in coordsn:
                 file_handler.write("{}\n".format(item))
 
@@ -72,9 +72,9 @@ def random_sample(gtpath, predpath, outpath, number_tiles, number_pixels):
         process_image(img_ps, 'pr', outpath)
 
     df = pd.DataFrame(columns=['label_names', 'pred_names'])
-    label_names = glob.glob(outpath+'gt/*')
-    pred_names = glob.glob(outpath+'pr/*')
+    label_names = glob.glob(f"{outpath}/gt/*")
+    pred_names = glob.glob(f"{outpath}/pr/*")
     df.label_names = label_names
     df.pred_names = pred_names
-    df.to_csv(outpath+'randomsample.csv')
+    df.to_csv(f"{outpath}/randomsample.csv")
     return
