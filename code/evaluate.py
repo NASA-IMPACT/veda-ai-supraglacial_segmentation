@@ -32,16 +32,13 @@ for l, p in zip(label_arr_lst_valid, pred_arr_lst_valid):
     ious['iou_0'].append(iou3)
     iou4 = eval_utils.maskIOU(l, p, 4)
     ious['iou_0'].append(iou4)
-    #iou5 = eval_utils.maskIOU(l, p, 5)
-    #iou_5.append(iou5)
 
 # Get per class averages
-iou_avg_0 = np.mean(iou_0)
-iou_avg_1 = np.mean(iou_1)
-iou_avg_2 = np.mean(iou_2)
-iou_avg_3 = np.mean(iou_3)
-iou_avg_4 = np.mean(iou_4)
-#iou_avg_5 = np.mean(iou_5)
+iou_avg_0 = np.mean(ious['iou_0'])
+iou_avg_1 = np.mean(ious['iou_1'])
+iou_avg_2 = np.mean(ious['iou_2'])
+iou_avg_3 = np.mean(ious['iou_3'])
+iou_avg_4 = np.mean(ious['iou_4'])
 
 
 # flatten our tensors and use scikit-learn to create a confusion matrix
