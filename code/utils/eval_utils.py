@@ -1,10 +1,5 @@
-import fnmatch, functools, glob
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-import matplotlib.image as mpimg
 import numpy as np
-import os
-import skimage.io as skio # lighter dependency than tensorflow for working with our tensors/arrays
 from sklearn.metrics import confusion_matrix, f1_score
 
 # Compute per class IoU        

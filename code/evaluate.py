@@ -1,8 +1,6 @@
-import fnmatch, functools, glob
 import numpy as np
 import os
 import pandas as pd
-from itertools import product
 import skimage.io as skio # lighter dependency than tensorflow for working with our tensors/arrays
 
 from utils import eval_utils

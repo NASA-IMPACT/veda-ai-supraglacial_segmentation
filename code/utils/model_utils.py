@@ -1,20 +1,8 @@
 
-import glob
 import json
-import os
-import skimage.io as skio
 import tensorflow as tf
-import tensorflow_addons as tfa
 import tensorflow_datasets as tfds
-from focal_loss import SparseCategoricalFocalLoss
-from PIL import Image
-from segmentation_models.metrics import iou_score
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, f1_score
 from tensorflow_examples.models.pix2pix import pix2pix
-from tensorflow.python.keras import backend as K  
-from tensorflow.python.keras import layers, losses, models
-from tf_explain.callbacks.activations_visualization import ActivationsVisualizationCallback
 
 tfds.disable_progress_bar()
 
