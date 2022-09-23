@@ -1,7 +1,6 @@
 import os, collections
 import numpy as np
-from PIL import Image
-from utils.datastats import get_class_counts_partitions, get_class_pcts_partitions, get_class_rgb_ranges_partitions
+from utils.datastats import get_class_counts_partitions, get_class_rgb_ranges_partitions
 import json
 
 with open("../configs/datasets.json", "r") as f:
