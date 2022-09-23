@@ -198,3 +198,7 @@ def get_vals_in_partition(partition_list, x_filenames, y_filenames):
 
 def flatten(partition_list):
     return [item for sublist in partition_list for item in sublist]
+
+def write_inferences_df(x_test_filenames, y_test_filenames, pred_paths, ROOT_DIR, BATCH_SIZE, EPOCHS):
+    path_df = pd.DataFrame(list(zip(x_test_filenames, y_test_filenames, pred_paths)), columns=["img_names", "label_names", "pred_names"])
+    path_df.to_csv(os.path.join(ROOT_DIR, "test_file_paths_{}_ep{}.csv".format(BATCH_SIZE, EPOCHS)))

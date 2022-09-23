@@ -19,25 +19,21 @@ pred_arr_lst = path_df["pred_names"].apply(skio.imread)
 
 pred_arr_lst_valid, label_arr_lst_valid = get_image_label_arrays(path_df)
 
-# Compute per class IoU        
-iou_0 = []
-iou_1 = []
-iou_2 = []
-iou_3 = []
-iou_4 = []
+# Compute per class IoU       
+ious = {'iou_0': [], 'iou_1': [], 'iou_2': [], 'iou_3': [], 'iou_4': []}
 #iou_5 = [] # commented out because ridge shadows was dropped as a class
 
 for l, p in zip(label_arr_lst_valid, pred_arr_lst_valid):
     iou0 = eval_utils.maskIOU(l, p, 0)
-    iou_0.append(iou0)
+    ious['iou_0'].append(iou0)
     iou1 = eval_utils.maskIOU(l, p, 1)
-    iou_1.append(iou1)
+    ious['iou_0'].append(iou1)
     iou2 = eval_utils.maskIOU(l, p, 2)
-    iou_2.append(iou2)
+    ious['iou_0'].append(iou2)
     iou3 = eval_utils.maskIOU(l, p, 3)
-    iou_3.append(iou3)
+    ious['iou_0'].append(iou3)
     iou4 = eval_utils.maskIOU(l, p, 4)
-    iou_4.append(iou4)
+    ious['iou_0'].append(iou4)
     #iou5 = eval_utils.maskIOU(l, p, 5)
     #iou_5.append(iou5)
 
