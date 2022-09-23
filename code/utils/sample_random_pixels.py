@@ -54,11 +54,8 @@ def random_sample(gtpath, predpath, outpath, number_tiles, number_pixels):
         coordsn = coords[0:number_pixels]
         coords = coords[number_pixels:]
 
-        img = np.array(Image.open(f"{gtpath}/{basename}.png"))
-        img1 = np.array(Image.open(f"{predpath}/{basename}.png"))
-
-        img_gt = img.copy()
-        img_ps = img1.copy()
+        img_gt = np.array(Image.open(f"{gtpath}/{basename}.png"))
+        img_ps = np.array(Image.open(f"{predpath}/{basename}.png"))
 
         for i in coords:
             img_gt[i[1],i[0]] = 0
