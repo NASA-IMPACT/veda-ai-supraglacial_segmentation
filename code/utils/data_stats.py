@@ -1,6 +1,18 @@
-import os, collections
 import numpy as np
 from PIL import Image
+
+def return_class_count(class_int,c):
+    """Returns the class count in unis of pixels per tile."""
+    if class_int in colors:
+        c+=color_count_dict[class_int]
+        return c
+
+def return_class_pct(class_int,pctl):
+    """Returns the class-wise percentage of pixels per tile."""
+    if class_int in colors:
+        pct = float(color_count_dict[class_int])/img.size
+        pctl.append((i, pct))
+        return pctl
 
 def get_class_counts_partitions(partition_list, c0,c1,c2,c3,c4,c5, num_classes):
     """Takes a list of filenames in a partition and counters (per class). Calculates the
@@ -12,11 +24,6 @@ def get_class_counts_partitions(partition_list, c0,c1,c2,c3,c4,c5, num_classes):
     Returns:
         c0,c1,c2,c3,c4,c5 (int): The counts.
     """
-    def return_class_count(class_int,c):
-        if class_int in colors:
-            c+=color_count_dict[class_int]
-            return c
-
     for i in partition_list:
         img = np.array(Image.open(i))
         #print(img.shape)
@@ -42,12 +49,6 @@ def get_class_pcts_partitions(partition_list, pcts_0,pcts_1,pcts_2,pcts_3,pcts_4
     Returns:
         n/a
     """
-    def return_class_pct(class_int,pctl):
-        if class_int in colors:
-            pct = float(color_count_dict[class_int])/img.size
-            pctl.append((i, pct))
-            return pctl
-
     for i in partition_list:
         img = np.array(Image.open(i))
         colors, counts = np.unique(img, return_counts = True)
