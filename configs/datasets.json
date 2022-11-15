@@ -1,10 +1,16 @@
 {"ROOT_DIR": "/home/ubuntu/data/", 
     "train_filenames": "train_list_manual_qa.txt",
+    "x_filenames": "x_train_filenames.txt", 
+    "y_filenames": "y_train_filenames.txt",
+    "background_files": "background_list_train.txt",
     "x_train_filenames_partition": "x_train_filenames_partition_manual_qa.txt", 
     "y_train_filenames_partition": "y_train_filenames_partition_manual_qa.txt",
     "x_val_filenames_partition": "x_val_filenames_partition_manual_qa.txt",
     "y_val_filenames_partition": "y_val_filenames_partition_manual_qa.txt",
     "x_test_filenames_partition": "x_test_filenames_partition_manual_qa.txt",
-    "y_test_filenames_partition": "y_test_filenames_partition_manual_qa.txt" 
-    }
-
+    "y_test_filenames_partition": "y_test_filenames_partition_manual_qa.txt",
+    "planetscope_image_dir": "planetscope", 
+    "icebridge_image_dir": "tiled_images",
+    "icebridge_label_dir": "tiled_labels", 
+    "image_shape": (96,96,3),
+}
