@@ -17,29 +17,7 @@ pred_arr_lst = path_df["pred_names"].apply(skio.imread)
 
 pred_arr_lst_valid, label_arr_lst_valid = get_image_label_arrays(path_df)
 
-# Compute per class IoU       
-ious = {'iou_0': [], 'iou_1': [], 'iou_2': [], 'iou_3': [], 'iou_4': []}
-#iou_5 = [] # commented out because ridge shadows was dropped as a class
-
-for l, p in zip(label_arr_lst_valid, pred_arr_lst_valid):
-    iou0 = eval_utils.maskIOU(l, p, 0)
-    ious['iou_0'].append(iou0)
-    iou1 = eval_utils.maskIOU(l, p, 1)
-    ious['iou_0'].append(iou1)
-    iou2 = eval_utils.maskIOU(l, p, 2)
-    ious['iou_0'].append(iou2)
-    iou3 = eval_utils.maskIOU(l, p, 3)
-    ious['iou_0'].append(iou3)
-    iou4 = eval_utils.maskIOU(l, p, 4)
-    ious['iou_0'].append(iou4)
-
-# Get per class averages
-iou_avg_0 = np.mean(ious['iou_0'])
-iou_avg_1 = np.mean(ious['iou_1'])
-iou_avg_2 = np.mean(ious['iou_2'])
-iou_avg_3 = np.mean(ious['iou_3'])
-iou_avg_4 = np.mean(ious['iou_4'])
-
+ious, iou_avg_0, iou_avg_1, iou_avg_2, iou_avg_3, iou_avg_4 = eval_utils.get_ious(label_arr_lst_valid, pred_arr_lst_valid)
 
 # flatten our tensors and use scikit-learn to create a confusion matrix
 flat_preds, flat_truth = eval_utils.flatten_arrays(pred_arr_lst_valid, label_arr_lst_valid)

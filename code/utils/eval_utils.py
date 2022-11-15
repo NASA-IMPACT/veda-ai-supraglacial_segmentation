@@ -78,7 +78,28 @@ def get_f1(flat_truth, flat_preds, num_classes)
     f1_scores_with_labels = {label:score for label,score in zip(labels, f1_scores)}
     return f1, f1_scores_with_labels
 
-print("f1 scores with labels: ", f1_scores_with_labels)
-print("overall f1 score: ", f1)
-print("cm: ", cm)
-print("iou_avg_0, iou_avg_1, iou_avg_2, iou_avg_3, iou_avg_4: ", iou_avg_0, iou_avg_1, iou_avg_2, iou_avg_3, iou_avg_4)
+def get_ious(label_arr_lst_valid, pred_arr_lst_valid):
+    # Compute per class IoU       
+    ious = {'iou_0': [], 'iou_1': [], 'iou_2': [], 'iou_3': [], 'iou_4': []}
+    #iou_5 = [] # commented out because ridge shadows was dropped as a class
+
+    for l, p in zip(label_arr_lst_valid, pred_arr_lst_valid):
+        iou0 = eval_utils.maskIOU(l, p, 0)
+        ious['iou_0'].append(iou0)
+        iou1 = eval_utils.maskIOU(l, p, 1)
+        ious['iou_0'].append(iou1)
+        iou2 = eval_utils.maskIOU(l, p, 2)
+        ious['iou_0'].append(iou2)
+        iou3 = eval_utils.maskIOU(l, p, 3)
+        ious['iou_0'].append(iou3)
+        iou4 = eval_utils.maskIOU(l, p, 4)
+        ious['iou_0'].append(iou4)
+
+    # Get per class averages
+    iou_avg_0 = np.mean(ious['iou_0'])
+    iou_avg_1 = np.mean(ious['iou_1'])
+    iou_avg_2 = np.mean(ious['iou_2'])
+    iou_avg_3 = np.mean(ious['iou_3'])
+    iou_avg_4 = np.mean(ious['iou_4'])
+
+    return ious, iou_avg_0, iou_avg_1, iou_avg_2, iou_avg_3, iou_avg_4
