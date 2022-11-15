@@ -1,7 +1,8 @@
-import os, collections
+import collections
+import json
+import os
 import numpy as np
 from utils.datastats import get_class_counts_partitions, get_class_rgb_ranges_partitions
-import json
 
 with open("../configs/datasets.json", "r") as f:
     datasets = json.load(f)

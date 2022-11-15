@@ -98,3 +98,4 @@ def get_class_rgb_ranges_partitions(partition_list_x, partition_list_y, r0,r1,r2
         return_rgb_values(r4,g4,b4,img, 4)
         return_rgb_values(r5,g5,b5,img, 5)
         return 
+        
