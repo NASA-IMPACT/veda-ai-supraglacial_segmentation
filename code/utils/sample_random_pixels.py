@@ -27,8 +27,7 @@ def process_image(image_array, image_type, OUT_PATH):
     if (not os.path.isdir(f"{OUT_PATH}/{str(image_type)}/")):
         os.mkdir(f"{OUT_PATH}/{str(image_type)}/")
     img.save(f"{OUT_PATH}/{str(image_type)}/{basename}.png")
-    return
-    
+
     
 
 def random_sample(GT_PATH, PRED_PATH, OUT_PATH, number_tiles, number_pixels):
@@ -75,4 +74,3 @@ def random_sample(GT_PATH, PRED_PATH, OUT_PATH, number_tiles, number_pixels):
     df.label_names = label_names
     df.pred_names = pred_names
     df.to_csv(f"{OUT_PATH}/randomsample.csv")
-    return
