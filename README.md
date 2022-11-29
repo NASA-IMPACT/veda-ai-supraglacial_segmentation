@@ -63,5 +63,7 @@ To evaluate the model, run `code/evaluate.py`. This will generate a normalized c
 
 A second method to produce a random sampling of pixels across test images for evaluation was developed to enable cross-comparison with [Wright, N. C. and Polashenski, C. M.: Open-source algorithm for detecting sea ice surface features in high-resolution optical imagery, The Cryosphere, 12, 1307–1329, https://doi.org/10.5194/tc-12-1307-2018, 2018](https://tc.copernicus.org/articles/12/1307/2018/) and can be run at `code/utils/sample_random_pixels.py`.
 
+<img src="assets/workflow.png" width="800px" height="auto">
+
 ## License
 This project is licensed under **Apache 2**, see the [LICENSE](LICENSE) file for more details.
