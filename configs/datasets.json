@@ -12,5 +12,6 @@
     "planetscope_image_dir": "planetscope", 
     "icebridge_image_dir": "tiled_images",
     "icebridge_label_dir": "tiled_labels", 
-    "image_shape": (96,96,3),
+    "icebridge_random_sample_dir": "random_samples", 
+    "image_shape": [96,96,3],
 }
