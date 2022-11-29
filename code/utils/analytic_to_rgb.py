@@ -19,12 +19,10 @@ def sr_to_rgb(root_dir, raster):
     filename_zero, fileext = filename_split
     basename = os.path.basename(filename_zero)
     rgbn = rasterio.open(raster)
-    rgbn_src = rgbn
     data = rgbn.read([3,2,1])
     scaled = (data * (255 / np.max(data))).astype(np.uint8)
-    outfile = os.path.join(root_dir,f'{basename}_rgb_scaled_uint8.tif')
-    rgb_out = rasterio.open(outfile, 'w', driver='GTiff', width=rgbn_src.width, height=rgbn_src.height, count=3,crs=rgbn_src.crs,transform=rgbn_src.transform,dtype='uint8')
-    rgb_out.write(scaled)
+    with rasterio.open(os.path.join(root_dir,f'{basename}_rgb_scaled_uint8.tif'), 'w', driver='GTiff', width=rgbn.width, height=rgbn.height, count=3,crs=rgbn.crs,transform=rgbn.transform,dtype='uint8') as rgb_out:
+        rgb_out.write(scaled)
     #plt.imshow(norm.transpose(1,2,0))
     return outfile
 
@@ -60,8 +58,6 @@ def tile(rgb, prefix, width, height, raster_dir, output_dir):
             transform = windows.transform(window, ds.transform)
             yield window, transform
 
-    tile_width, tile_height = width, height
-
     def crop(inpath, outpath, c):
         # read input image
         image = rasterio.open(inpath)
@@ -74,8 +70,8 @@ def tile(rgb, prefix, width, height, raster_dir, output_dir):
         meta['driver']='PNG'
         meta['dtype']='uint8'
         # tile the input image by the mini-windows
-        i = 0
-        for window, transform in get_tiles(image):
+        #i = 0
+        for window, transform in enumerate(get_tiles(image)): #get_tiles(image):
             meta['transform'] = transform
             meta['width'], meta['height'] = window.width, window.height
             outfile = os.path.join(outpath,"tile_%s_%s.png" % (prefix, str(i)))
@@ -85,7 +81,7 @@ def tile(rgb, prefix, width, height, raster_dir, output_dir):
                 imw = imw[:,:,:3] #rgba2rgb(imw)
                 imw = imw.transpose(2,0,1)
                 outds.write(imw)
-            i = i+1
+            #i = i+1
 
     def process_tiles():
         inpath = os.path.join(rgb)
